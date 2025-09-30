@@ -1,1 +1,33 @@
+# Binaries for programs and plugins
+*.exe
+*.exe~
+*.dll
+*.so
+*.dylib
+
+# Test binary, built with `go test -c`
+*.test
+
+# Output of the go coverage tool, specifically when used with LiteIDE
+*.out
+
+# Dependency directories (uncomment to include vendored dependencies)
+# vendor/
+
+# Go module cache
+# This directory is where Go stores downloaded modules. It should generally not be committed.
+# Depending on your setup, this might be in your user's home directory or inside your project.
+# If it's within your project, you might want to exclude it.
+# For example, if you're using `go mod vendor`, the `vendor/` directory is created.
+
+# IDE and editor specific files
+.idea/
+.vscode/
+*.swp
+*.bak
+*~
+.DS_Store
+
+# Logs and temporary files
+*.log
 tmp/
