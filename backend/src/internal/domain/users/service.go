@@ -5,19 +5,23 @@ import (
 	"regexp"
 
 	"golang.org/x/crypto/bcrypt"
+
+	"fairlance/internal/auth"
 )
 
 type UserService interface {
 	CreateUser(user *User, password string) (uint, error)
 	LoginUser(email, password string) (string, error)
+	GetUserByID(userID uint) (*User, error)
 }
 
 type userService struct {
-	repo UserRepository
+	repo         UserRepository
+	tokenManager *auth.TokenManager
 }
 
-func NewUserService(repo UserRepository) UserService {
-	return &userService{repo: repo}
+func NewUserService(repo UserRepository, tokenManager *auth.TokenManager) UserService {
+	return &userService{repo: repo, tokenManager: tokenManager}
 }
 
 func HashPassword(password string) (string, error) {
@@ -69,7 +73,9 @@ func (s *userService) LoginUser(email, password string) (string, error) {
 		return "", errors.New(IVALID_CREDENTIALS)
 	}
 
-	// Generate JWT token (implementation omitted for brevity)
-	token := "mocked-jwt-token" // Replace with actual token generation logic
-	return token, nil
+	return s.tokenManager.GenerateToken(user.ID, user.RoleID)
+}
+
+func (s *userService) GetUserByID(userID uint) (*User, error) {
+	return s.repo.GetUserByID(userID)
 }

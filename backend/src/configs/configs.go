@@ -18,6 +18,8 @@ type Config struct {
 	DBMaxOpenConns       int    `envconfig:"DB_MAX_OPEN_CONNS" default:"25"`
 	DBMaxIdleConns       int    `envconfig:"DB_MAX_IDLE_CONNS" default:"25"`
 	DBConnMaxLifetimeMin int    `envconfig:"DB_CONN_MAX_LIFETIME_MIN" default:"5"`
+
+	JWTSecret string `envconfig:"JWT_SECRET" default:"supersecretkey"`
 }
 
 func Load() (*Config, error) {

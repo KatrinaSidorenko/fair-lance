@@ -61,3 +61,20 @@ func (h *UserHandler) LoginUser(c *gin.Context) {
 	res := LoginResponse{Token: token}
 	c.JSON(http.StatusOK, res)
 }
+
+func (h *UserHandler) GetMe(c *gin.Context) {
+	userID, exists := c.Get("user_id")
+	if !exists {
+		c.JSON(http.StatusInternalServerError, errors.ForbiddenError("user ID not found in context"))
+		return
+	}
+
+	user, _ := h.service.GetUserByID(userID.(uint))
+	userRespone := UserResponse{
+		ID:       user.ID,
+		Username: user.Username,
+		Email:    user.Email,
+		RoleID:   user.RoleID,
+	}
+	c.JSON(http.StatusOK, userRespone)
+}

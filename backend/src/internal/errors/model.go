@@ -39,3 +39,10 @@ func UnauthorizedError(message string) *ErrorResult {
 	e.Message = message
 	return e
 }
+
+func ForbiddenError(message string) *ErrorResult {
+	e := &ErrorResult{}
+	e.Code = ErrCodeForbidden
+	e.Message = message
+	return e
+}
