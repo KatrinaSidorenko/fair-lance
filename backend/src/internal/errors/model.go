@@ -32,3 +32,10 @@ func InternalError(message string) *ErrorResult {
 	e.Message = message
 	return e
 }
+
+func UnauthorizedError(message string) *ErrorResult {
+	e := &ErrorResult{}
+	e.Code = ErrCodeUnauthorized
+	e.Message = message
+	return e
+}
