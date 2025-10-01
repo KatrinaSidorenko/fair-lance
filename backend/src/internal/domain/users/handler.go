@@ -5,6 +5,8 @@ import (
 
 	"github.com/gin-gonic/gin"
 	"gorm.io/gorm"
+
+	"fairlance/internal/errors"
 )
 
 type UserHandler struct {
@@ -19,21 +21,19 @@ func NewUserHandler(service UserService, db *gorm.DB) *UserHandler {
 func (h *UserHandler) RegisterUser(c *gin.Context) {
 	var req CreateUserRequest
 	if err := c.ShouldBindJSON(&req); err != nil {
-		c.JSON(http.StatusBadRequest, gin.H{"error": err.Error()})
+		c.JSON(http.StatusBadRequest, errors.InvalidInputError(err.Error()))
 		return
 	}
 
-	hashed, _ := HashPassword(req.Password)
 	user := User{
-		Username:     req.Username,
-		Email:        req.Email,
-		PasswordHash: hashed,
-		RoleID:       req.RoleID,
+		Username: req.Username,
+		Email:    req.Email,
+		RoleID:   req.RoleID,
 	}
 
-	id, err := h.service.CreateUser(&user)
+	id, err := h.service.CreateUser(&user, req.Password)
 	if err != nil {
-		c.JSON(http.StatusInternalServerError, gin.H{"error": err.Error()})
+		c.JSON(http.StatusInternalServerError, errors.InternalError(err.Error()))
 		return
 	}
 

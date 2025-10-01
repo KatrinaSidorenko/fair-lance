@@ -6,6 +6,7 @@ import (
 
 type UserRepository interface {
 	CreateUser(user *User) (uint, error)
+	GetUserByEmail(email string) (*User, error)
 }
 
 type userRepository struct{
@@ -21,5 +22,16 @@ func (r *userRepository) CreateUser(user *User) (uint, error) {
         return 0, err
     }
     return user.ID, nil
+}
+
+func (r *userRepository) GetUserByEmail(email string) (*User, error) {
+	var user User
+	if err := r.db.Where("email = ?", email).First(&user).Error; err != nil {
+		if err == gorm.ErrRecordNotFound {
+			return nil, nil
+		}
+		return nil, err
+	}	
+	return &user, nil
 }
 
