@@ -78,3 +78,21 @@ func (h *UserHandler) GetMe(c *gin.Context) {
 	}
 	c.JSON(http.StatusOK, userRespone)
 }
+
+func (h *UserHandler) GetAllUsers(c *gin.Context) {
+	users, err := h.service.GetAllUsers()
+	if err != nil {
+		c.JSON(http.StatusInternalServerError, errors.InternalError(err.Error()))
+		return
+	}
+	var userResponses []UserResponse
+	for _, user := range users {
+		userResponses = append(userResponses, UserResponse{
+			ID:       user.ID,
+			Username: user.Username,
+			Email:    user.Email,
+			RoleID:   user.RoleID,
+		})
+	}
+	c.JSON(http.StatusOK, userResponses)
+}
