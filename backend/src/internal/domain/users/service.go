@@ -13,6 +13,7 @@ type UserService interface {
 	CreateUser(user *User, password string) (uint, error)
 	LoginUser(email, password string) (string, error)
 	GetUserByID(userID uint) (*User, error)
+	GetAllUsers() ([]User, error)
 }
 
 type userService struct {
@@ -78,4 +79,8 @@ func (s *userService) LoginUser(email, password string) (string, error) {
 
 func (s *userService) GetUserByID(userID uint) (*User, error) {
 	return s.repo.GetUserByID(userID)
+}
+
+func (s *userService) GetAllUsers() ([]User, error) {
+	return s.repo.GetAllUsers()
 }

@@ -1,6 +1,7 @@
 package auth
 
 import (
+	"fmt"
 	"net/http"
 	"strings"
 
@@ -32,7 +33,7 @@ func JWTAuthMiddleware(tokenManger *TokenManager) gin.HandlerFunc {
 		}
 
 		c.Set("user_id", claims.UserID)
-		c.Set("role_id", claims.RoleID)
+		c.Set("role_id", fmt.Sprint(claims.RoleID))
 		c.Next()
 	}
 }

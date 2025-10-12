@@ -20,6 +20,8 @@ type Config struct {
 	DBConnMaxLifetimeMin int    `envconfig:"DB_CONN_MAX_LIFETIME_MIN" default:"5"`
 
 	JWTSecret string `envconfig:"JWT_SECRET" default:"supersecretkey"`
+
+	AdminPassword string `envconfig:"ADMIN_PASSWORD" default:"admin123"`
 }
 
 func Load() (*Config, error) {

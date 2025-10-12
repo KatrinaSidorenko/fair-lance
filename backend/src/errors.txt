@@ -1,0 +1,33 @@
+==== File: ./internal/auth/errors.go ====
+package auth
+
+const (
+	AUTH_HEADER_MISSING      = "AE0"
+	INVALID_FORMAT           = "AE1" // Bearer {token}
+	INVALID_OR_EXPIRED_TOKEN = "AE2"
+)
+
+
+==== File: ./internal/domain/roles/errors.go ====
+package roles
+
+const (
+	ROLE_NOT_FOUND          = "RE0"
+	ROLE_NOT_FOUND_IN_TOKEN = "RE1"
+	ACCESS_DENIED           = "RE2"
+)
+
+
+==== File: ./internal/domain/users/errors.go ====
+package users
+
+const (
+	USER_NOT_FOUND      = "UE0"
+	INVLID_USERNAME     = "UE1" // username should be at least 3 characters long
+	INVALD_EMAIL        = "UE2" // invalid email format
+	INVLID_PASSWORD     = "UE3" // password should be at least 6 characters long
+	USER_ALREADY_EXISTS = "UE4" // user with given email or username already exists
+	IVALID_CREDENTIALS  = "UE5" // invalid credentials
+)
+
+

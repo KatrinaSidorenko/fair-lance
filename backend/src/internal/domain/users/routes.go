@@ -4,6 +4,7 @@ import (
 	"github.com/gin-gonic/gin"
 
 	"fairlance/internal/auth"
+	"fairlance/internal/domain/roles"
 )
 
 func RegisterUserRoutes(r *gin.Engine, handler *UserHandler, tokenManager *auth.TokenManager) {
@@ -16,5 +17,11 @@ func RegisterUserRoutes(r *gin.Engine, handler *UserHandler, tokenManager *auth.
 	protected.Use(auth.JWTAuthMiddleware(tokenManager))
 	{
 		protected.GET("/me", handler.GetMe)
+
+		admin := protected.Group("")
+		admin.Use(roles.RequireRoles(roles.ADMIN))
+		{
+			admin.GET("/all", handler.GetAllUsers)
+		}
 	}
 }
