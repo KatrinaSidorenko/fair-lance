@@ -9,6 +9,7 @@ import (
 
 	"fairlance/internal/domain/users"
 
+	"github.com/gin-contrib/cors"
 	"github.com/gin-gonic/gin"
 )
 
@@ -29,8 +30,18 @@ func main() {
 	userHandler := users.NewUserHandler(userService, database)
 
 	r := gin.Default()
+
+	r.Use(cors.New(cors.Config{
+		AllowOrigins:     []string{"http://localhost:3000"},
+		AllowMethods:     []string{"GET", "POST", "PUT", "DELETE", "OPTIONS"},
+		AllowHeaders:     []string{"Origin", "Content-Type", "Accept", "Authorization"},
+		ExposeHeaders:    []string{"Content-Length"},
+		AllowCredentials: true,
+	}))
+
 	users.RegisterUserRoutes(r, userHandler, tokenManger)
 
 	// todo: take port from configs + shutdown gracefully
-	r.Run(":8080")
+	// changed to 8085 to avoid local port conflict, sorry ^_^
+	r.Run(":8085")
 }
