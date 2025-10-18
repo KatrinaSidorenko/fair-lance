@@ -4,18 +4,16 @@ import (
 	"net/http"
 
 	"github.com/gin-gonic/gin"
-	"gorm.io/gorm"
 
 	"fairlance/internal/errors"
 )
 
 type UserHandler struct {
 	service UserService
-	db      *gorm.DB
 }
 
-func NewUserHandler(service UserService, db *gorm.DB) *UserHandler {
-	return &UserHandler{service: service, db: db}
+func NewUserHandler(service UserService) *UserHandler {
+	return &UserHandler{service: service}
 }
 
 func (h *UserHandler) RegisterUser(c *gin.Context) {

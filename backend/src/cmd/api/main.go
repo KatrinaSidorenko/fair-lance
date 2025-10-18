@@ -7,6 +7,7 @@ import (
 	"fairlance/internal/auth"
 	"fairlance/internal/db"
 
+	"fairlance/internal/domain/jobs"
 	"fairlance/internal/domain/users"
 
 	"github.com/gin-contrib/cors"
@@ -27,7 +28,15 @@ func main() {
 	tokenManger := auth.NewJWTManager(cfg.JWTSecret)
 	userRepo := users.NewUserRepository(database)
 	userService := users.NewUserService(userRepo, tokenManger)
-	userHandler := users.NewUserHandler(userService, database)
+	userHandler := users.NewUserHandler(userService)
+
+	// blobService := blobs.NewBlobService(database)
+	// fileRepo := files.NewFileRepository(database)
+	// fileService := files.NewFileService(fileRepo, blobService)
+
+	jobRepo := jobs.NewJobRepository(database)
+	jobService := jobs.NewJobService(jobRepo)
+	jobHandler := jobs.NewJobHandler(jobService)
 
 	r := gin.Default()
 
@@ -40,6 +49,7 @@ func main() {
 	}))
 
 	users.RegisterUserRoutes(r, userHandler, tokenManger)
+	jobs.RegisterJobRoutes(r, jobHandler, tokenManger)
 
 	// todo: take port from configs + shutdown gracefully
 	// changed to 8085 to avoid local port conflict, sorry ^_^
