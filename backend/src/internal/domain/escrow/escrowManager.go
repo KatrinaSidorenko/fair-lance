@@ -31,7 +31,7 @@ var (
 
 // EscrowMetaData contains all meta data concerning the Escrow contract.
 var EscrowMetaData = &bind.MetaData{
-	ABI: "[{\"anonymous\":false,\"inputs\":[{\"indexed\":true,\"internalType\":\"uint256\",\"name\":\"jobId\",\"type\":\"uint256\"},{\"indexed\":false,\"internalType\":\"uint256\",\"name\":\"amount\",\"type\":\"uint256\"}],\"name\":\"JobApproved\",\"type\":\"event\"},{\"anonymous\":false,\"inputs\":[{\"indexed\":true,\"internalType\":\"uint256\",\"name\":\"jobId\",\"type\":\"uint256\"},{\"indexed\":true,\"internalType\":\"address\",\"name\":\"freelancer\",\"type\":\"address\"}],\"name\":\"JobAssigned\",\"type\":\"event\"},{\"anonymous\":false,\"inputs\":[{\"indexed\":true,\"internalType\":\"uint256\",\"name\":\"jobId\",\"type\":\"uint256\"},{\"indexed\":false,\"internalType\":\"uint256\",\"name\":\"amount\",\"type\":\"uint256\"}],\"name\":\"JobPublished\",\"type\":\"event\"},{\"anonymous\":false,\"inputs\":[{\"indexed\":true,\"internalType\":\"uint256\",\"name\":\"jobId\",\"type\":\"uint256\"},{\"indexed\":true,\"internalType\":\"address\",\"name\":\"user\",\"type\":\"address\"},{\"indexed\":false,\"internalType\":\"uint256\",\"name\":\"amount\",\"type\":\"uint256\"}],\"name\":\"Withdrawn\",\"type\":\"event\"},{\"inputs\":[{\"internalType\":\"uint256\",\"name\":\"\",\"type\":\"uint256\"}],\"name\":\"jobs\",\"outputs\":[{\"internalType\":\"address\",\"name\":\"employer\",\"type\":\"address\"},{\"internalType\":\"uint256\",\"name\":\"amount\",\"type\":\"uint256\"},{\"internalType\":\"bool\",\"name\":\"funded\",\"type\":\"bool\"},{\"internalType\":\"bool\",\"name\":\"approved\",\"type\":\"bool\"},{\"internalType\":\"bool\",\"name\":\"completed\",\"type\":\"bool\"}],\"stateMutability\":\"view\",\"type\":\"function\"},{\"inputs\":[{\"internalType\":\"uint256\",\"name\":\"\",\"type\":\"uint256\"}],\"name\":\"pendingWithdrawals\",\"outputs\":[{\"internalType\":\"uint256\",\"name\":\"\",\"type\":\"uint256\"}],\"stateMutability\":\"view\",\"type\":\"function\"},{\"stateMutability\":\"payable\",\"type\":\"receive\"},{\"inputs\":[{\"internalType\":\"uint256\",\"name\":\"jobId\",\"type\":\"uint256\"}],\"name\":\"publishJob\",\"outputs\":[],\"stateMutability\":\"payable\",\"type\":\"function\"},{\"inputs\":[{\"internalType\":\"uint256\",\"name\":\"jobId\",\"type\":\"uint256\"}],\"name\":\"approveJob\",\"outputs\":[],\"stateMutability\":\"nonpayable\",\"type\":\"function\"},{\"inputs\":[{\"internalType\":\"uint256\",\"name\":\"jobId\",\"type\":\"uint256\"}],\"name\":\"withdraw\",\"outputs\":[],\"stateMutability\":\"nonpayable\",\"type\":\"function\"}]",
+	ABI: "[{\"anonymous\":false,\"inputs\":[{\"indexed\":true,\"internalType\":\"uint256\",\"name\":\"jobId\",\"type\":\"uint256\"},{\"indexed\":false,\"internalType\":\"uint256\",\"name\":\"amount\",\"type\":\"uint256\"}],\"name\":\"JobApproved\",\"type\":\"event\"},{\"anonymous\":false,\"inputs\":[{\"indexed\":true,\"internalType\":\"uint256\",\"name\":\"jobId\",\"type\":\"uint256\"},{\"indexed\":true,\"internalType\":\"address\",\"name\":\"freelancer\",\"type\":\"address\"}],\"name\":\"JobAssigned\",\"type\":\"event\"},{\"anonymous\":false,\"inputs\":[{\"indexed\":true,\"internalType\":\"uint256\",\"name\":\"jobId\",\"type\":\"uint256\"},{\"indexed\":false,\"internalType\":\"uint256\",\"name\":\"amount\",\"type\":\"uint256\"}],\"name\":\"JobPublished\",\"type\":\"event\"},{\"anonymous\":false,\"inputs\":[{\"indexed\":true,\"internalType\":\"uint256\",\"name\":\"jobId\",\"type\":\"uint256\"},{\"indexed\":true,\"internalType\":\"address\",\"name\":\"user\",\"type\":\"address\"},{\"indexed\":false,\"internalType\":\"uint256\",\"name\":\"amount\",\"type\":\"uint256\"}],\"name\":\"Withdrawn\",\"type\":\"event\"},{\"inputs\":[{\"internalType\":\"uint256\",\"name\":\"\",\"type\":\"uint256\"}],\"name\":\"jobs\",\"outputs\":[{\"internalType\":\"address\",\"name\":\"employer\",\"type\":\"address\"},{\"internalType\":\"address\",\"name\":\"freelancer\",\"type\":\"address\"},{\"internalType\":\"uint256\",\"name\":\"amount\",\"type\":\"uint256\"},{\"internalType\":\"bool\",\"name\":\"funded\",\"type\":\"bool\"},{\"internalType\":\"bool\",\"name\":\"approved\",\"type\":\"bool\"},{\"internalType\":\"bool\",\"name\":\"completed\",\"type\":\"bool\"}],\"stateMutability\":\"view\",\"type\":\"function\",\"constant\":true},{\"inputs\":[{\"internalType\":\"uint256\",\"name\":\"\",\"type\":\"uint256\"}],\"name\":\"pendingWithdrawals\",\"outputs\":[{\"internalType\":\"uint256\",\"name\":\"\",\"type\":\"uint256\"}],\"stateMutability\":\"view\",\"type\":\"function\",\"constant\":true},{\"stateMutability\":\"payable\",\"type\":\"receive\",\"payable\":true},{\"inputs\":[{\"internalType\":\"uint256\",\"name\":\"jobId\",\"type\":\"uint256\"}],\"name\":\"publishJob\",\"outputs\":[],\"stateMutability\":\"payable\",\"type\":\"function\",\"payable\":true},{\"inputs\":[{\"internalType\":\"uint256\",\"name\":\"jobId\",\"type\":\"uint256\"},{\"internalType\":\"address\",\"name\":\"freelancer\",\"type\":\"address\"}],\"name\":\"assignExecutor\",\"outputs\":[],\"stateMutability\":\"nonpayable\",\"type\":\"function\"},{\"inputs\":[{\"internalType\":\"uint256\",\"name\":\"jobId\",\"type\":\"uint256\"}],\"name\":\"approveJob\",\"outputs\":[],\"stateMutability\":\"nonpayable\",\"type\":\"function\"},{\"inputs\":[{\"internalType\":\"uint256\",\"name\":\"jobId\",\"type\":\"uint256\"}],\"name\":\"withdraw\",\"outputs\":[],\"stateMutability\":\"nonpayable\",\"type\":\"function\"}]",
 }
 
 // EscrowABI is the input ABI used to generate the binding from.
@@ -182,33 +182,36 @@ func (_Escrow *EscrowTransactorRaw) Transact(opts *bind.TransactOpts, method str
 
 // Jobs is a free data retrieval call binding the contract method 0x180aedf3.
 //
-// Solidity: function jobs(uint256 ) view returns(address employer, uint256 amount, bool funded, bool approved, bool completed)
+// Solidity: function jobs(uint256 ) view returns(address employer, address freelancer, uint256 amount, bool funded, bool approved, bool completed)
 func (_Escrow *EscrowCaller) Jobs(opts *bind.CallOpts, arg0 *big.Int) (struct {
-	Employer  common.Address
-	Amount    *big.Int
-	Funded    bool
-	Approved  bool
-	Completed bool
+	Employer   common.Address
+	Freelancer common.Address
+	Amount     *big.Int
+	Funded     bool
+	Approved   bool
+	Completed  bool
 }, error) {
 	var out []interface{}
 	err := _Escrow.contract.Call(opts, &out, "jobs", arg0)
 
 	outstruct := new(struct {
-		Employer  common.Address
-		Amount    *big.Int
-		Funded    bool
-		Approved  bool
-		Completed bool
+		Employer   common.Address
+		Freelancer common.Address
+		Amount     *big.Int
+		Funded     bool
+		Approved   bool
+		Completed  bool
 	})
 	if err != nil {
 		return *outstruct, err
 	}
 
 	outstruct.Employer = *abi.ConvertType(out[0], new(common.Address)).(*common.Address)
-	outstruct.Amount = *abi.ConvertType(out[1], new(*big.Int)).(**big.Int)
-	outstruct.Funded = *abi.ConvertType(out[2], new(bool)).(*bool)
-	outstruct.Approved = *abi.ConvertType(out[3], new(bool)).(*bool)
-	outstruct.Completed = *abi.ConvertType(out[4], new(bool)).(*bool)
+	outstruct.Freelancer = *abi.ConvertType(out[1], new(common.Address)).(*common.Address)
+	outstruct.Amount = *abi.ConvertType(out[2], new(*big.Int)).(**big.Int)
+	outstruct.Funded = *abi.ConvertType(out[3], new(bool)).(*bool)
+	outstruct.Approved = *abi.ConvertType(out[4], new(bool)).(*bool)
+	outstruct.Completed = *abi.ConvertType(out[5], new(bool)).(*bool)
 
 	return *outstruct, err
 
@@ -216,26 +219,28 @@ func (_Escrow *EscrowCaller) Jobs(opts *bind.CallOpts, arg0 *big.Int) (struct {
 
 // Jobs is a free data retrieval call binding the contract method 0x180aedf3.
 //
-// Solidity: function jobs(uint256 ) view returns(address employer, uint256 amount, bool funded, bool approved, bool completed)
+// Solidity: function jobs(uint256 ) view returns(address employer, address freelancer, uint256 amount, bool funded, bool approved, bool completed)
 func (_Escrow *EscrowSession) Jobs(arg0 *big.Int) (struct {
-	Employer  common.Address
-	Amount    *big.Int
-	Funded    bool
-	Approved  bool
-	Completed bool
+	Employer   common.Address
+	Freelancer common.Address
+	Amount     *big.Int
+	Funded     bool
+	Approved   bool
+	Completed  bool
 }, error) {
 	return _Escrow.Contract.Jobs(&_Escrow.CallOpts, arg0)
 }
 
 // Jobs is a free data retrieval call binding the contract method 0x180aedf3.
 //
-// Solidity: function jobs(uint256 ) view returns(address employer, uint256 amount, bool funded, bool approved, bool completed)
+// Solidity: function jobs(uint256 ) view returns(address employer, address freelancer, uint256 amount, bool funded, bool approved, bool completed)
 func (_Escrow *EscrowCallerSession) Jobs(arg0 *big.Int) (struct {
-	Employer  common.Address
-	Amount    *big.Int
-	Funded    bool
-	Approved  bool
-	Completed bool
+	Employer   common.Address
+	Freelancer common.Address
+	Amount     *big.Int
+	Funded     bool
+	Approved   bool
+	Completed  bool
 }, error) {
 	return _Escrow.Contract.Jobs(&_Escrow.CallOpts, arg0)
 }
@@ -290,6 +295,27 @@ func (_Escrow *EscrowSession) ApproveJob(jobId *big.Int) (*types.Transaction, er
 // Solidity: function approveJob(uint256 jobId) returns()
 func (_Escrow *EscrowTransactorSession) ApproveJob(jobId *big.Int) (*types.Transaction, error) {
 	return _Escrow.Contract.ApproveJob(&_Escrow.TransactOpts, jobId)
+}
+
+// AssignExecutor is a paid mutator transaction binding the contract method 0x69c6a1c2.
+//
+// Solidity: function assignExecutor(uint256 jobId, address freelancer) returns()
+func (_Escrow *EscrowTransactor) AssignExecutor(opts *bind.TransactOpts, jobId *big.Int, freelancer common.Address) (*types.Transaction, error) {
+	return _Escrow.contract.Transact(opts, "assignExecutor", jobId, freelancer)
+}
+
+// AssignExecutor is a paid mutator transaction binding the contract method 0x69c6a1c2.
+//
+// Solidity: function assignExecutor(uint256 jobId, address freelancer) returns()
+func (_Escrow *EscrowSession) AssignExecutor(jobId *big.Int, freelancer common.Address) (*types.Transaction, error) {
+	return _Escrow.Contract.AssignExecutor(&_Escrow.TransactOpts, jobId, freelancer)
+}
+
+// AssignExecutor is a paid mutator transaction binding the contract method 0x69c6a1c2.
+//
+// Solidity: function assignExecutor(uint256 jobId, address freelancer) returns()
+func (_Escrow *EscrowTransactorSession) AssignExecutor(jobId *big.Int, freelancer common.Address) (*types.Transaction, error) {
+	return _Escrow.Contract.AssignExecutor(&_Escrow.TransactOpts, jobId, freelancer)
 }
 
 // PublishJob is a paid mutator transaction binding the contract method 0x5f3b221f.
