@@ -32,12 +32,7 @@ func StartEventListener(cfg *configs.Config, eventsRepository *events.EventRepos
 
 	ctx := context.Background()
 
-	latestBlock, err := eventsRepository.GetLatestBlockNumber()
-	if err != nil {
-		log.Println("❌ Failed to get latest block number from events repository:", err)
-		return
-	}
-
+	latestBlock, _ := eventsRepository.GetLatestBlockNumber()
 	startBlock := latestBlock
 	const (
 		batchSize    = 10              // number of blocks to scan per batch
