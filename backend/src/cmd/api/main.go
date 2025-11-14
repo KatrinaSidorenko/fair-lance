@@ -11,6 +11,7 @@ import (
 
 	"fairlance/internal/domain/escrow"
 	"fairlance/internal/domain/events"
+	jobapplications "fairlance/internal/domain/job_applications"
 	"fairlance/internal/domain/jobs"
 	"fairlance/internal/domain/users"
 
@@ -42,8 +43,13 @@ func main() {
 	jobService := jobs.NewJobService(jobRepo)
 	jobHandler := jobs.NewJobHandler(jobService)
 
+	jobApplicationRepo := jobapplications.NewJobApplicationRepository(database)
+	jobApplicationService := jobapplications.NewJobApplicationService(jobApplicationRepo)
+	jobApplicationHandler := jobapplications.NewJobApplicationHandler(jobApplicationService, jobService)
+
 	eventsRepository := events.NewEventRepository(database)
 	go escrow.StartEventListener(cfg, eventsRepository)
+	// todo: configure this
 	batchSize := 10
 	interval := time.Second * 10
 	go events.ProcessEvents(context.Background(), batchSize, interval, eventsRepository, jobRepo)
@@ -60,7 +66,7 @@ func main() {
 
 	users.RegisterUserRoutes(r, userHandler, tokenManger)
 	jobs.RegisterJobRoutes(r, jobHandler, tokenManger)
-
+	jobapplications.RegiaterJobApplicationRoutes(r, jobApplicationHandler, tokenManger)
 	// todo: take port from configs + shutdown gracefully
 	// changed to 8085 to avoid local port conflict, sorry ^_^
 	r.Run(":8085")

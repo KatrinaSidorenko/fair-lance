@@ -103,3 +103,5 @@ func processJobEvents(jobID uint, events []*BlockchainEvent, jobRepository jobs.
 func markEventsAsProcessed(eventIDs []uint, evntRepository *EventRepository) error {
 	return evntRepository.MarkEventsAsProcessed(eventIDs)
 }
+
+// todo: create request of freelancers (frelancer_job) + assign logic
