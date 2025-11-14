@@ -63,3 +63,23 @@ func (h *JobApplicationHandler) GetJobApplicationByID(c *gin.Context) {
 
 	c.JSON(http.StatusOK, ToJobApplicationResponseDTO(jobApplication))
 }
+
+func (h *JobApplicationHandler) GetAllApplicationsByJobID(c *gin.Context) {
+	idStr := c.Param("job_id")
+	id, err := strconv.Atoi(idStr)
+	if err != nil {
+		c.JSON(http.StatusBadRequest, gin.H{"error": "invalid job id"})
+		return
+	}
+	applications, err := h.service.GetAllApplicationsByJobID(uint(id))
+	if err != nil {
+		c.JSON(http.StatusInternalServerError, gin.H{"error": "Failed to get job applications"})
+		return
+	}
+	var responseDTOs []JobApplicationResponseDTO
+	for _, app := range applications {
+		responseDTOs = append(responseDTOs, *ToJobApplicationResponseDTO(app))
+	}
+
+	c.JSON(http.StatusOK, responseDTOs)
+}

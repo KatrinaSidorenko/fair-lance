@@ -20,4 +20,9 @@ func RegiaterJobApplicationRoutes(rg *gin.Engine, handler *JobApplicationHandler
 			freelancer.GET("/:id", handler.GetJobApplicationByID)
 		}
 	}
+	employer := protected.Group("")
+	employer.Use(roles.RequireRoles(roles.EMPLOYER, roles.ADMIN))
+	{
+		employer.GET("/:job_id", handler.GetAllApplicationsByJobID)
+	}
 }
