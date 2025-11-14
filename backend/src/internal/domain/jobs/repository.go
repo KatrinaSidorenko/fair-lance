@@ -9,6 +9,7 @@ type JobRepository interface {
 	UpdateJobStatus(id uint, status JobStatus) error
 	Delete(id uint) error
 	GetAllByUserID(userId uint) ([]*Job, error)
+	GetAllJobsByStatus(status JobStatus) ([]*Job, error)
 }
 
 type jobRepository struct {
@@ -58,6 +59,14 @@ func (r *jobRepository) Delete(id uint) error {
 func (r *jobRepository) GetAllByUserID(userId uint) ([]*Job, error) {
 	var jobs []*Job
 	if err := r.db.Where("user_id = ?", userId).Find(&jobs).Error; err != nil {
+		return nil, err
+	}
+	return jobs, nil
+}
+
+func (r *jobRepository) GetAllJobsByStatus(status JobStatus) ([]*Job, error) {
+	var jobs []*Job
+	if err := r.db.Where("status = ? and is_active = ?", status, true).Find(&jobs).Error; err != nil {
 		return nil, err
 	}
 	return jobs, nil

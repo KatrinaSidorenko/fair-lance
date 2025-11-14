@@ -14,6 +14,7 @@ type JobService interface {
 	UpdateJob(job *UpdateJobDto) error
 	DeleteJob(id uint) error
 	GetAllUserJobs(userId uint) ([]*Job, error)
+	GetPublishedJobs() ([]*Job, error)
 }
 
 type jobService struct {
@@ -106,3 +107,16 @@ func (s *jobService) GetAllUserJobs(userId uint) ([]*Job, error) {
 	}
 	return activeJobs, nil
 }
+
+func (s *jobService) UpdateJobStatus(jobID uint, status JobStatus) error {
+	return s.jobRepository.UpdateJobStatus(jobID, status)
+}
+
+func (s *jobService) GetPublishedJobs() ([]*Job, error) {
+	jobs, err := s.jobRepository.GetAllJobsByStatus(JobStatusPublished)
+	if err != nil {
+		return nil, fmt.Errorf("failed to get published jobs: %w", err)
+	}
+	return jobs, nil
+}
+

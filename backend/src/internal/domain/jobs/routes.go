@@ -10,6 +10,7 @@ import (
 func RegisterJobRoutes(r *gin.Engine, handler *JobHandler, tokenManager *auth.TokenManager) {
 	api := r.Group("/jobs")
 	api.GET("/:job_id", handler.GetJob)
+	api.GET("/published", handler.GetPublichedJobs)
 
 	protected := api.Group("")
 	protected.Use(auth.JWTAuthMiddleware(tokenManager))

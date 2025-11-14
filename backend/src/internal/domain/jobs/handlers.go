@@ -116,3 +116,12 @@ func (h *JobHandler) DeleteJob(c *gin.Context) {
 	}
 	c.JSON(http.StatusNoContent, gin.H{"message": "job deleted successfully"})
 }
+
+func (h *JobHandler) GetPublichedJobs(c *gin.Context) {
+	jobs, err := h.service.GetPublishedJobs()
+	if err != nil {
+		c.JSON(http.StatusInternalServerError, gin.H{"error": err.Error()})
+		return
+	}
+	c.JSON(http.StatusOK, jobs)
+}
