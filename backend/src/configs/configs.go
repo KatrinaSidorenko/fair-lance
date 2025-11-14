@@ -22,6 +22,9 @@ type Config struct {
 	JWTSecret string `envconfig:"JWT_SECRET" default:"supersecretkey"`
 
 	AdminPassword string `envconfig:"ADMIN_PASSWORD" default:"admin123"`
+
+	RPCURL         string `envconfig:"RPC_URL" default:"http://localhost:8545"`
+	ContractAddress string `envconfig:"CONTRACT" default:"0xYourDeployedContractAddress"`
 }
 
 func Load() (*Config, error) {

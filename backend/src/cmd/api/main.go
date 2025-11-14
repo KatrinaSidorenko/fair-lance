@@ -7,6 +7,8 @@ import (
 	"fairlance/internal/auth"
 	"fairlance/internal/db"
 
+	"fairlance/internal/domain/escrow"
+	"fairlance/internal/domain/events"
 	"fairlance/internal/domain/jobs"
 	"fairlance/internal/domain/users"
 
@@ -37,6 +39,9 @@ func main() {
 	jobRepo := jobs.NewJobRepository(database)
 	jobService := jobs.NewJobService(jobRepo)
 	jobHandler := jobs.NewJobHandler(jobService)
+
+	eventsRepository := events.NewEventRepository(database)
+	go escrow.StartEventListener(cfg, eventsRepository)
 
 	r := gin.Default()
 
