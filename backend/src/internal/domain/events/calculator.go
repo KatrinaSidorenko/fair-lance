@@ -98,38 +98,47 @@ func processJobEvents(jobID uint, events []*BlockchainEvent, jobRepository jobs.
 		return err
 	}
 
-	jobApp := (*jobapplications.JobApplication)(nil)
-
+	var jobApp *jobapplications.JobApplication
 	sortEventsAsc(events)
+
 	for _, ev := range events {
 		switch ev.EventType {
 		case JobPublishedEventType:
 			job.Status = jobs.JobStatusPublished
+
 		case JobAssignedEventType:
 			job.Status = jobs.JobStatusAssigned
-			jobApp, err := jobRepository.GetJobApplicationByFreelancerAddress(jobID, ev.UserAddress)
+
+			// use assignment (=) not short-declaration (:=) to avoid shadowing outer jobApp/err
+			tmp, err := jobRepository.GetJobApplicationByFreelancerAddress(jobID, ev.UserAddress)
 			if err != nil {
 				return err
 			}
-			if jobApp != nil {
-				jobApp.Status = string(jobapplications.ApplicationStatusAccepted)
+			if tmp != nil {
+				tmp.Status = string(jobapplications.ApplicationStatusAccepted)
+				jobApp = tmp // assign to single jobApp variable
 			}
+
 		case JobApprovedEventType:
 			job.Status = jobs.JobStatusApproved
-			jobApp, err := jobRepository.GetAcceptedApplicationForJob(jobID)
+
+			tmp, err := jobRepository.GetAcceptedApplicationForJob(jobID)
 			if err != nil {
 				return err
 			}
-			if jobApp != nil {
-				jobApp.Status = string(jobapplications.ApplicationStatusApproved)
+			if tmp != nil {
+				tmp.Status = string(jobapplications.ApplicationStatusApproved)
+				jobApp = tmp
 			}
+
 		case JobWithdrawnEventType:
-			jobApp, err := jobRepository.GetApprovedApplicationForJob(jobID)
+			tmp, err := jobRepository.GetApprovedApplicationForJob(jobID)
 			if err != nil {
 				return err
 			}
-			if jobApp != nil {
-				jobApp.Status = string(jobapplications.ApplicationStatusClosed)
+			if tmp != nil {
+				tmp.Status = string(jobapplications.ApplicationStatusClosed)
+				jobApp = tmp
 			}
 			job.Status = jobs.JobStatusClosed
 		}
