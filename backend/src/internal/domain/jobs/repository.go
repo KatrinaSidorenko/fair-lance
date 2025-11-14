@@ -101,7 +101,7 @@ func (r *jobRepository) Delete(id uint) error {
 
 func (r *jobRepository) GetAllByUserID(userId uint) ([]*Job, error) {
 	var jobs []*Job
-	if err := r.db.Where("user_id = ?", userId).Find(&jobs).Error; err != nil {
+	if err := r.db.Where("employer_id = ?", userId).Find(&jobs).Error; err != nil {
 		return nil, err
 	}
 	return jobs, nil
