@@ -9,6 +9,7 @@ CREATE TABLE jobs (
     budget NUMERIC(15, 2) NOT NULL,
     created_at TIMESTAMP NOT NULL DEFAULT NOW(),
     updated_at TIMESTAMP NOT NULL DEFAULT NOW(),
+    is_active BOOLEAN NOT NULL DEFAULT TRUE,
     CONSTRAINT fk_job_employer
         FOREIGN KEY (employer_id) REFERENCES users(id) ON DELETE CASCADE
 );

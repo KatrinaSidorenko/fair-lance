@@ -7,6 +7,7 @@ type JobRepository interface {
 	GetByID(id uint) (*Job, error)
 	Update(job *Job) error
 	Delete(id uint) error
+	GetAllByUserID(userId uint) ([]*Job, error)
 }
 
 type jobRepository struct {
@@ -47,4 +48,12 @@ func (r *jobRepository) Delete(id uint) error {
 		return err
 	}
 	return nil
+}
+
+func (r *jobRepository) GetAllByUserID(userId uint) ([]*Job, error) {
+	var jobs []*Job
+	if err := r.db.Where("user_id = ?", userId).Find(&jobs).Error; err != nil {
+		return nil, err
+	}
+	return jobs, nil
 }

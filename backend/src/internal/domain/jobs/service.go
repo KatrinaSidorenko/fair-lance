@@ -13,6 +13,7 @@ type JobService interface {
 	GetJobByID(id uint) (*Job, error)
 	UpdateJob(job *UpdateJobDto) error
 	DeleteJob(id uint) error
+	GetAllUserJobs(userId uint) ([]*Job, error)
 }
 
 type jobService struct {
@@ -28,7 +29,14 @@ func (s *jobService) CreateJob(job *Job) error {
 	return s.jobRepository.Create(job)
 }
 func (s *jobService) GetJobByID(id uint) (*Job, error) {
-	return s.jobRepository.GetByID(id)
+	job, err := s.jobRepository.GetByID(id)
+	if err != nil {
+		return nil, fmt.Errorf("failed to get job: %w", err)
+	}
+	if !job.IsActive {
+		return nil, gorm.ErrRecordNotFound
+	}
+	return job, nil
 }
 func (s *jobService) UpdateJob(dto *UpdateJobDto) error {
 	existingJob, err := s.jobRepository.GetByID(dto.ID)
@@ -70,5 +78,31 @@ func (s *jobService) UpdateJob(dto *UpdateJobDto) error {
 }
 
 func (s *jobService) DeleteJob(id uint) error {
-	return s.jobRepository.Delete(id)
+	job, err := s.jobRepository.GetByID(id)
+	if err != nil {
+		return fmt.Errorf("failed to get job: %w", err)
+	}
+	if job == nil {
+		return gorm.ErrRecordNotFound
+	}
+	job.IsActive = false
+	return s.jobRepository.Update(job)
+}
+
+func (s *jobService) GetAllUserJobs(userId uint) ([]*Job, error) {
+	var jobs []*Job
+	var err error
+	jobs, err = s.jobRepository.GetAllByUserID(userId)
+	if err != nil {
+		return nil, fmt.Errorf("failed to get user jobs: %w", err)
+	}
+
+	// todo: it will better to filter on db level
+	activeJobs := make([]*Job, 0)
+	for _, job := range jobs {
+		if job.IsActive {
+			activeJobs = append(activeJobs, job)
+		}
+	}
+	return activeJobs, nil
 }
