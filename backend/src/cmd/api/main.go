@@ -45,7 +45,7 @@ func main() {
 
 	jobApplicationRepo := jobapplications.NewJobApplicationRepository(database)
 	jobApplicationService := jobapplications.NewJobApplicationService(jobApplicationRepo)
-	jobApplicationHandler := jobapplications.NewJobApplicationHandler(jobApplicationService, jobService)
+	jobApplicationHandler := jobapplications.NewJobApplicationHandler(jobApplicationService)
 
 	eventsRepository := events.NewEventRepository(database)
 	go escrow.StartEventListener(cfg, eventsRepository)

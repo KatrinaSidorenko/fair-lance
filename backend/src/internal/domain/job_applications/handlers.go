@@ -1,7 +1,6 @@
 package jobapplications
 
 import (
-	"fairlance/internal/domain/jobs"
 	"net/http"
 	"strconv"
 
@@ -9,14 +8,12 @@ import (
 )
 
 type JobApplicationHandler struct {
-	service    JobApplicationService
-	jobService jobs.JobService
+	service JobApplicationService
 }
 
-func NewJobApplicationHandler(service JobApplicationService, jobService jobs.JobService) *JobApplicationHandler {
+func NewJobApplicationHandler(service JobApplicationService) *JobApplicationHandler {
 	return &JobApplicationHandler{
-		service:    service,
-		jobService: jobService,
+		service: service,
 	}
 }
 
@@ -34,11 +31,11 @@ func (h *JobApplicationHandler) CreateJobApplication(c *gin.Context) {
 	}
 
 	app := ToJobApplication(&dto, userIDValue.(uint))
-	_, err := h.jobService.GetJobByID(app.JobID)
-	if err != nil {
-		c.JSON(http.StatusInternalServerError, gin.H{"error": "Job not found"})
-		return
-	}
+	// _, err := h.jobService.GetJobByID(app.JobID)
+	// if err != nil {
+	// 	c.JSON(http.StatusInternalServerError, gin.H{"error": "Job not found"})
+	// 	return
+	// }
 
 	if err := h.service.CreateApplication(app); err != nil {
 		c.JSON(http.StatusInternalServerError, gin.H{"error": "Failed to create job application"})

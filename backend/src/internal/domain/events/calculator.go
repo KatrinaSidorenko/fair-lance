@@ -64,6 +64,7 @@ func eventsIterator(batchSize int, evntRepository *EventRepository, jobRepositor
 
 	processedIDs := []uint{}
 
+	// todo: idea to change on bulk update
 	for jobID, jobEvents := range grouped {
 		if err := processJobEvents(jobID, jobEvents, jobRepository); err != nil {
 			return nil, err

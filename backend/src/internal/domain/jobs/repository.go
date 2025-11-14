@@ -1,6 +1,10 @@
 package jobs
 
-import "gorm.io/gorm"
+import (
+	jobapplications "fairlance/internal/domain/job_applications"
+
+	"gorm.io/gorm"
+)
 
 type JobRepository interface {
 	Create(job *Job) error
@@ -46,6 +50,34 @@ func (r *jobRepository) Update(job *Job) error {
 }
 
 func (r *jobRepository) UpdateJobStatus(id uint, status JobStatus) error {
+	// todo: realy bad place for this logic
+	if status == JobStatusApproved {
+		var jobApp jobapplications.JobApplication
+		if err := r.db.Where("job_id = ? AND status = ?", id, string(jobapplications.ApplicationStatusAccepted)).First(&jobApp).Error; err != nil {
+			if err == gorm.ErrRecordNotFound {
+				return nil
+			}
+			return err
+		}
+		jobApp.Status = string(jobapplications.ApplicationStatusApproved)
+		if err := r.db.Save(&jobApp).Error; err != nil {
+			return err
+		}
+	}
+
+	if status == JobStatusClosed {
+		var jobApp jobapplications.JobApplication
+		if err := r.db.Where("job_id = ? AND status IN ?", id, []string{string(jobapplications.ApplicationStatusApproved)}).First(&jobApp).Error; err != nil {
+			if err == gorm.ErrRecordNotFound {
+				return nil
+			}
+			return err
+		}
+		jobApp.Status = string(jobapplications.ApplicationStatusClosed)
+		if err := r.db.Save(&jobApp).Error; err != nil {
+			return err
+		}
+	}
 	return r.db.Model(&Job{}).Where("id = ?", id).Update("status", status).Error
 }
 

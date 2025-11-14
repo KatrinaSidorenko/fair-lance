@@ -18,7 +18,8 @@ type ApplicationStatus string
 const (
 	ApplicationStatusPending   ApplicationStatus = "pending"
 	ApplicationStatusAccepted  ApplicationStatus = "accepted"
+	ApplicationStatusSubmitted ApplicationStatus = "submitted"
+	ApplicationStatusApproved  ApplicationStatus = "approved"
 	ApplicationStatusRejected  ApplicationStatus = "rejected"
-	ApplicationStatusWithdrawn ApplicationStatus = "withdrawn"
 	ApplicationStatusClosed    ApplicationStatus = "closed"
 )
