@@ -24,5 +24,6 @@ func RegiaterJobApplicationRoutes(rg *gin.Engine, handler *JobApplicationHandler
 	employer.Use(roles.RequireRoles(roles.EMPLOYER, roles.ADMIN))
 	{
 		employer.GET("/:job_id", handler.GetAllApplicationsByJobID)
+		employer.POST("/accept/:id", handler.AcceptJobApplication)
 	}
 }

@@ -18,6 +18,7 @@ func RegisterJobRoutes(r *gin.Engine, handler *JobHandler, tokenManager *auth.To
 		employer := protected.Group("")
 		employer.Use(roles.RequireRoles(roles.EMPLOYER, roles.ADMIN))
 		{
+			employer.GET("", handler.GetUserJobs)
 			employer.POST("", handler.CreateJob)
 			employer.PUT("", handler.UpdateJob)
 			employer.DELETE("/:job_id", handler.DeleteJob)

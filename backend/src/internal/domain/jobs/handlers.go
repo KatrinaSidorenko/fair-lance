@@ -125,3 +125,17 @@ func (h *JobHandler) GetPublichedJobs(c *gin.Context) {
 	}
 	c.JSON(http.StatusOK, jobs)
 }
+
+func (h *JobHandler) GetUserJobs(c *gin.Context) {
+	userID, exists := c.Get("user_id")
+	if !exists {
+		c.JSON(http.StatusInternalServerError, gin.H{"error": "user id not found in context"})
+		return
+	}
+	jobs, err := h.service.GetAllUserJobs(userID.(uint))
+	if err != nil {
+		c.JSON(http.StatusInternalServerError, gin.H{"error": err.Error()})
+		return
+	}
+	c.JSON(http.StatusOK, jobs)
+}
