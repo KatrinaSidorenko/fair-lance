@@ -108,10 +108,6 @@ func (s *jobService) GetAllUserJobs(userId uint) ([]*Job, error) {
 	return activeJobs, nil
 }
 
-func (s *jobService) UpdateJobStatus(jobID uint, status JobStatus) error {
-	return s.jobRepository.UpdateJobStatus(jobID, status)
-}
-
 func (s *jobService) GetPublishedJobs() ([]*Job, error) {
 	jobs, err := s.jobRepository.GetAllJobsByStatus(JobStatusPublished)
 	if err != nil {

@@ -18,3 +18,8 @@ type UpdateJobDto struct {
 	Currency    *string  `json:"currency" binding:"omitempty,len=3"`
 	Status      *string  `json:"status" binding:"omitempty,oneof=draft published assigned approved closed"`
 }
+
+type JobUpdateData struct {
+	Status            JobStatus
+	FreelancerAddress string
+}

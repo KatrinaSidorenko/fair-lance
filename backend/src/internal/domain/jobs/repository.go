@@ -10,10 +10,13 @@ type JobRepository interface {
 	Create(job *Job) error
 	GetByID(id uint) (*Job, error)
 	Update(job *Job) error
-	UpdateJobStatus(id uint, status JobStatus) error
 	Delete(id uint) error
 	GetAllByUserID(userId uint) ([]*Job, error)
 	GetAllJobsByStatus(status JobStatus) ([]*Job, error)
+	GetAcceptedApplicationForJob(jobID uint) (*jobapplications.JobApplication, error)
+	GetApprovedApplicationForJob(jobID uint) (*jobapplications.JobApplication, error)
+	GetJobApplicationByFreelancerAddress(jobID uint, freelancerAddress string) (*jobapplications.JobApplication, error)
+	UpdateJobApplication(jobApplication *jobapplications.JobApplication) error
 }
 
 type jobRepository struct {
@@ -49,36 +52,44 @@ func (r *jobRepository) Update(job *Job) error {
 	return nil
 }
 
-func (r *jobRepository) UpdateJobStatus(id uint, status JobStatus) error {
-	// todo: realy bad place for this logic
-	if status == JobStatusApproved {
-		var jobApp jobapplications.JobApplication
-		if err := r.db.Where("job_id = ? AND status = ?", id, string(jobapplications.ApplicationStatusAccepted)).First(&jobApp).Error; err != nil {
-			if err == gorm.ErrRecordNotFound {
-				return nil
-			}
-			return err
+func (r *jobRepository) GetAcceptedApplicationForJob(jobID uint) (*jobapplications.JobApplication, error) {
+	var jobApp jobapplications.JobApplication
+	if err := r.db.Where("job_id = ? AND status = ?", jobID, string(jobapplications.ApplicationStatusAccepted)).First(&jobApp).Error; err != nil {
+		if err == gorm.ErrRecordNotFound {
+			return nil, nil
 		}
-		jobApp.Status = string(jobapplications.ApplicationStatusApproved)
-		if err := r.db.Save(&jobApp).Error; err != nil {
-			return err
-		}
+		return nil, err
 	}
+	return &jobApp, nil
+}
 
-	if status == JobStatusClosed {
-		var jobApp jobapplications.JobApplication
-		if err := r.db.Where("job_id = ? AND status IN ?", id, []string{string(jobapplications.ApplicationStatusApproved)}).First(&jobApp).Error; err != nil {
-			if err == gorm.ErrRecordNotFound {
-				return nil
-			}
-			return err
+func (r *jobRepository) GetApprovedApplicationForJob(jobID uint) (*jobapplications.JobApplication, error) {
+	var jobApp jobapplications.JobApplication
+	if err := r.db.Where("job_id = ? AND status = ?", jobID, string(jobapplications.ApplicationStatusApproved)).First(&jobApp).Error; err != nil {
+		if err == gorm.ErrRecordNotFound {
+			return nil, nil
 		}
-		jobApp.Status = string(jobapplications.ApplicationStatusClosed)
-		if err := r.db.Save(&jobApp).Error; err != nil {
-			return err
-		}
+		return nil, err
 	}
-	return r.db.Model(&Job{}).Where("id = ?", id).Update("status", status).Error
+	return &jobApp, nil
+}
+
+func (r *jobRepository) GetJobApplicationByFreelancerAddress(jobID uint, freelancerAddress string) (*jobapplications.JobApplication, error) {
+	var jobApp jobapplications.JobApplication
+	if err := r.db.Where("job_id = ? AND freelancer_address = ?", jobID, freelancerAddress).First(&jobApp).Error; err != nil {
+		if err == gorm.ErrRecordNotFound {
+			return nil, nil
+		}
+		return nil, err
+	}
+	return &jobApp, nil
+}
+
+func (r *jobRepository) UpdateJobApplication(jobApplication *jobapplications.JobApplication) error {
+	if err := r.db.Save(jobApplication).Error; err != nil {
+		return err
+	}
+	return nil
 }
 
 func (r *jobRepository) Delete(id uint) error {

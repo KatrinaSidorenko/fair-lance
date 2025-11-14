@@ -2,8 +2,10 @@ package events
 
 import (
 	"context"
+	jobapplications "fairlance/internal/domain/job_applications"
 	"fairlance/internal/domain/jobs"
 	"log"
+	"sort"
 	"time"
 )
 
@@ -79,23 +81,68 @@ func eventsIterator(batchSize int, evntRepository *EventRepository, jobRepositor
 	return processedIDs, nil
 }
 
-func processJobEvents(jobID uint, events []*BlockchainEvent, jobRepository jobs.JobRepository) error {
-	var newStatus jobs.JobStatus
+func sortEventsAsc(events []*BlockchainEvent) {
+	sort.Slice(events, func(i, j int) bool {
+		return events[i].Timestamp.Before(events[j].Timestamp)
+	})
+	// now iterate in time order
+	for _, ev := range events {
+		// handle ev
+		_ = ev
+	}
+}
 
+func processJobEvents(jobID uint, events []*BlockchainEvent, jobRepository jobs.JobRepository) error {
+	job, err := jobRepository.GetByID(jobID)
+	if err != nil {
+		return err
+	}
+
+	jobApp := (*jobapplications.JobApplication)(nil)
+
+	sortEventsAsc(events)
 	for _, ev := range events {
 		switch ev.EventType {
-
 		case JobPublishedEventType:
-			newStatus = jobs.JobStatusPublished
+			job.Status = jobs.JobStatusPublished
+		case JobAssignedEventType:
+			job.Status = jobs.JobStatusAssigned
+			jobApp, err := jobRepository.GetJobApplicationByFreelancerAddress(jobID, ev.UserAddress)
+			if err != nil {
+				return err
+			}
+			if jobApp != nil {
+				jobApp.Status = string(jobapplications.ApplicationStatusAccepted)
+			}
 		case JobApprovedEventType:
-			newStatus = jobs.JobStatusApproved
+			job.Status = jobs.JobStatusApproved
+			jobApp, err := jobRepository.GetAcceptedApplicationForJob(jobID)
+			if err != nil {
+				return err
+			}
+			if jobApp != nil {
+				jobApp.Status = string(jobapplications.ApplicationStatusApproved)
+			}
 		case JobWithdrawnEventType:
-			newStatus = jobs.JobStatusClosed
+			jobApp, err := jobRepository.GetApprovedApplicationForJob(jobID)
+			if err != nil {
+				return err
+			}
+			if jobApp != nil {
+				jobApp.Status = string(jobapplications.ApplicationStatusClosed)
+			}
+			job.Status = jobs.JobStatusClosed
 		}
 	}
 
-	if newStatus != "" {
-		return jobRepository.UpdateJobStatus(jobID, newStatus)
+	if err := jobRepository.Update(job); err != nil {
+		return err
+	}
+
+	if jobApp != nil {
+		if err := jobRepository.UpdateJobApplication(jobApp); err != nil {
+			return err
+		}
 	}
 
 	return nil
@@ -104,5 +151,3 @@ func processJobEvents(jobID uint, events []*BlockchainEvent, jobRepository jobs.
 func markEventsAsProcessed(eventIDs []uint, evntRepository *EventRepository) error {
 	return evntRepository.MarkEventsAsProcessed(eventIDs)
 }
-
-// todo: create request of freelancers (frelancer_job) + assign logic

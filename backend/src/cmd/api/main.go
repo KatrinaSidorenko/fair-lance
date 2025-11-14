@@ -66,7 +66,7 @@ func main() {
 
 	users.RegisterUserRoutes(r, userHandler, tokenManger)
 	jobs.RegisterJobRoutes(r, jobHandler, tokenManger)
-	jobapplications.RegiaterJobApplicationRoutes(r, jobApplicationHandler, tokenManger)
+	jobapplications.RegisterJobApplicationRoutes(r.Group(""), jobApplicationHandler, tokenManger)
 	// todo: take port from configs + shutdown gracefully
 	// changed to 8085 to avoid local port conflict, sorry ^_^
 	r.Run(":8085")

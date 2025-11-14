@@ -20,6 +20,13 @@ func NewJobApplicationService(repo JobApplicationRepository) JobApplicationServi
 }
 
 func (s *jobApplicationService) CreateApplication(application *JobApplication) error {
+	existsingApp, err := s.repo.GetByJobAndFreelancer(application.JobID, application.FreelancerID)
+	if err != nil {
+		return err
+	}
+	if existsingApp != nil {
+		return gorm.ErrInvalidData
+	}
 	return s.repo.Create(application)
 }
 func (s *jobApplicationService) GetApplicationByID(id uint) (*JobApplication, error) {

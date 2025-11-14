@@ -42,4 +42,5 @@ func StartEventListener(cfg *configs.Config, eventsRepository *events.EventRepos
 	go StartJobPublishedPolling(ctx, client, esc, eventsRepository, startBlock, batchSize, tickInterval)
 	go StartJobApprovedPolling(ctx, client, esc, eventsRepository, startBlock, batchSize, tickInterval)
 	go StartWithdrawnPolling(ctx, client, esc, eventsRepository, startBlock, batchSize, tickInterval)
+	go StartJobAssignedPolling(ctx, client, esc, eventsRepository, startBlock, batchSize, tickInterval)
 }

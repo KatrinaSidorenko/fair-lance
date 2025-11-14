@@ -20,4 +20,5 @@ const (
 	JobPublishedEventType = "JobPublished"
 	JobApprovedEventType  = "JobApproved"
 	JobWithdrawnEventType = "Withdrawn"
+	JobAssignedEventType  = "JobAssigned"
 )
