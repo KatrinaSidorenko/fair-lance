@@ -5,7 +5,7 @@ import "time"
 type BlockchainEvent struct {
 	ID          uint      `gorm:"primaryKey" json:"id"`
 	EventType   string    `json:"event_type"`   // e.g. JobPublished, JobApproved, Withdrawn
-	JobID       string    `json:"job_id"`       // Job identifier from contract
+	JobID       uint      `json:"job_id"`       // Job identifier from contract
 	UserAddress string    `json:"user_address"` // optional, e.g. freelancer address
 	Amount      string    `json:"amount"`       // in wei, store as string to avoid precision loss
 	TxHash      string    `json:"tx_hash"`      // transaction hash
@@ -19,5 +19,5 @@ type BlockchainEvent struct {
 const (
 	JobPublishedEventType = "JobPublished"
 	JobApprovedEventType  = "JobApproved"
-	WithdrawnEventType    = "Withdrawn"
+	JobWithdrawnEventType = "Withdrawn"
 )

@@ -31,8 +31,8 @@ func ProcessWithdrawnEvents(events0 []*EscrowWithdrawn) ([]*events.BlockchainEve
 	var processedEvents = make([]*events.BlockchainEvent, 0, len(events0))
 	for _, e := range events0 {
 		processedEvents = append(processedEvents, &events.BlockchainEvent{
-			EventType:   events.WithdrawnEventType,
-			JobID:       e.JobId.String(),
+			EventType:   events.JobWithdrawnEventType,
+			JobID:       uint(e.JobId.Int64()),
 			Amount:      e.Amount.String(),
 			UserAddress: e.User.Hex(),
 			TxHash:      e.Raw.TxHash.Hex(),

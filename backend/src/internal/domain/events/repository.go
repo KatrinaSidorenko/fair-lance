@@ -16,6 +16,7 @@ func (r *EventRepository) SaveEvent(event *BlockchainEvent) error {
 	return r.db.Create(event).Error
 }
 
+// todo: will be good to add job existnce chack + amount declared in job
 func (r *EventRepository) SaveEvents(events []*BlockchainEvent) error {
 	if len(events) == 0 {
 		return nil
@@ -56,4 +57,22 @@ func (r *EventRepository) GetLatestBlockNumber() (uint64, error) {
 		return 0, err
 	}
 	return event.BlockNumber, nil
+}
+
+func (r *EventRepository) MarkEventsAsProcessed(eventIDs []uint) error {
+	if len(eventIDs) == 0 {
+		return nil
+	}
+	return r.db.Model(&BlockchainEvent{}).
+		Where("id IN ?", eventIDs).
+		Update("is_processed", true).Error
+}
+
+func (r *EventRepository) GetUnprocessedEvents(batchSize int) ([]BlockchainEvent, error) {
+	var events []BlockchainEvent
+	err := r.db.Where("is_processed = ?", false).
+		Order("timestamp asc").
+		Limit(batchSize).
+		Find(&events).Error
+	return events, err
 }

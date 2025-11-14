@@ -6,6 +6,7 @@ type JobRepository interface {
 	Create(job *Job) error
 	GetByID(id uint) (*Job, error)
 	Update(job *Job) error
+	UpdateJobStatus(id uint, status JobStatus) error
 	Delete(id uint) error
 	GetAllByUserID(userId uint) ([]*Job, error)
 }
@@ -41,6 +42,10 @@ func (r *jobRepository) Update(job *Job) error {
 		return err
 	}
 	return nil
+}
+
+func (r *jobRepository) UpdateJobStatus(id uint, status JobStatus) error {
+	return r.db.Model(&Job{}).Where("id = ?", id).Update("status", status).Error
 }
 
 func (r *jobRepository) Delete(id uint) error {

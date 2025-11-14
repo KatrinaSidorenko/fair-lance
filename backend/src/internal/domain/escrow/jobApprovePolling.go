@@ -31,7 +31,7 @@ func ProcessJobApprovedEvents(events0 []*EscrowJobApproved) ([]*events.Blockchai
 	for _, e := range events0 {
 		processedEvents = append(processedEvents, &events.BlockchainEvent{
 			EventType:   events.JobApprovedEventType,
-			JobID:       e.JobId.String(),
+			JobID:       uint(e.JobId.Int64()),
 			Amount:      e.Amount.String(),
 			TxHash:      e.Raw.TxHash.Hex(),
 			BlockNumber: e.Raw.BlockNumber,

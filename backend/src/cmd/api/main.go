@@ -1,7 +1,9 @@
 package main
 
 import (
+	"context"
 	"log"
+	"time"
 
 	"fairlance/configs"
 	"fairlance/internal/auth"
@@ -42,6 +44,9 @@ func main() {
 
 	eventsRepository := events.NewEventRepository(database)
 	go escrow.StartEventListener(cfg, eventsRepository)
+	batchSize := 10
+	interval := time.Second * 10
+	go events.ProcessEvents(context.Background(), batchSize, interval, eventsRepository, jobRepo)
 
 	r := gin.Default()
 
