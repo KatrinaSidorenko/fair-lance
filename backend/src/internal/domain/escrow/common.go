@@ -39,7 +39,7 @@ func StartEventPolling[T any](
 
 			currentBlock := header.Number.Uint64()
 			if currentBlock <= lastBlock {
-				continue
+				lastBlock = currentBlock
 			}
 
 			start := lastBlock + 1
