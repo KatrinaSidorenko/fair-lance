@@ -20,6 +20,9 @@ func NewJobHandler(service JobService) *JobHandler {
 	return &JobHandler{service: service}
 }
 
+// budget is stored in db in wei
+// return budget in ETH
+
 func (h *JobHandler) CreateJob(c *gin.Context) {
 	userID, exists := c.Get("user_id")
 	if !exists {
@@ -33,6 +36,7 @@ func (h *JobHandler) CreateJob(c *gin.Context) {
 		return
 	}
 
+	// todo: extract validation logic
 	parsedDueTime, err := helpers.ParseISO8601Date(req.DueDate)
 	if err != nil {
 		c.JSON(400, gin.H{"error": "Invalid due date format"})
@@ -45,12 +49,13 @@ func (h *JobHandler) CreateJob(c *gin.Context) {
 		return
 	}
 
+	// todo: create mappers
 	job := Job{
 		Title:       req.Title,
 		Description: req.Description,
 		DueDate:     parsedDueTime,
 		Budget:      req.Budget,
-		Currency:    req.Currency,
+		Currency:    *req.Currency,
 		Status:      parsedStatus,
 		EmployerID:  userID.(uint),
 	}
@@ -60,7 +65,9 @@ func (h *JobHandler) CreateJob(c *gin.Context) {
 		return
 	}
 
-	c.JSON(201, job.ID)
+	c.JSON(201, gin.H{
+		"job_id": job.ID,
+	})
 }
 
 func (h *JobHandler) GetJob(c *gin.Context) {

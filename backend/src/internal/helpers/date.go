@@ -13,3 +13,7 @@ func ParseISO8601Date(dateStr string) (time.Time, error) {
 func FormatISO8601Date(t time.Time) string {
 	return t.Format(ISO8601Layout)
 }
+
+func GetCurrentTimeUTC() time.Time {
+	return time.Now().UTC()
+}

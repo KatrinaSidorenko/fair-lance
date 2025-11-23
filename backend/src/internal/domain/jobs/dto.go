@@ -5,7 +5,7 @@ type CreateJobDto struct {
 	Description string  `json:"description" binding:"required"`
 	DueDate     string  `json:"due_date" binding:"required"`
 	Budget      float64 `json:"budget" binding:"required,gt=0"`
-	Currency    string  `json:"currency" binding:"required,len=3"`
+	Currency    *string `json:"currency" binding:"required,len=3,oneof=ETH wei,default=ETH"`
 	Status      string  `json:"status" binding:"omitempty,oneof=draft published assigned approved closed"`
 }
 
