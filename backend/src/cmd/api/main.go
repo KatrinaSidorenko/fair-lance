@@ -12,6 +12,7 @@ import (
 	"fairlance/internal/domain/escrow"
 	"fairlance/internal/domain/events"
 	jobapplications "fairlance/internal/domain/job_applications"
+	jobSubmit "fairlance/internal/domain/job_submit"
 	"fairlance/internal/domain/jobs"
 	"fairlance/internal/domain/users"
 
@@ -47,6 +48,10 @@ func main() {
 	jobApplicationService := jobapplications.NewJobApplicationService(jobApplicationRepo)
 	jobApplicationHandler := jobapplications.NewJobApplicationHandler(jobApplicationService)
 
+	jobSubmitRepo := jobSubmit.NewJobSubmitRepository(database)
+	jobSubmitService := jobSubmit.NewJobSubmitService(jobSubmitRepo)
+	jobSubmitHandler := jobSubmit.NewJobSubmitHandler(jobSubmitService)
+
 	eventsRepository := events.NewEventRepository(database)
 	go escrow.StartEventListener(cfg, eventsRepository)
 	// todo: configure this
@@ -67,6 +72,7 @@ func main() {
 	users.RegisterUserRoutes(r, userHandler, tokenManger)
 	jobs.RegisterJobRoutes(r, jobHandler, tokenManger)
 	jobapplications.RegisterJobApplicationRoutes(r.Group(""), jobApplicationHandler, tokenManger)
+	jobSubmit.RegisterJobSubmitRoutes(r.Group(""), jobSubmitHandler, tokenManger)
 	// todo: take port from configs + shutdown gracefully
 	// changed to 8085 to avoid local port conflict, sorry ^_^
 	r.Run(":8085")
