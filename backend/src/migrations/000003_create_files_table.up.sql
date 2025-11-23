@@ -2,8 +2,8 @@
 CREATE TABLE blobs (
     id SERIAL PRIMARY KEY,
     content BYTEA NOT NULL,
-    created_at TIMESTAMP NOT NULL DEFAULT NOW(),
-    updated_at TIMESTAMP NOT NULL DEFAULT NOW()
+    created_at TIMESTAMPTZ NOT NULL DEFAULT NOW(),
+    updated_at TIMESTAMPTZ NOT NULL DEFAULT NOW()
 );
 
 -- FILE TABLE
@@ -13,8 +13,8 @@ CREATE TABLE files (
     mime_type VARCHAR(100) NOT NULL,
     size BIGINT NOT NULL,
     blob_id INT NOT NULL,
-    created_at TIMESTAMP NOT NULL DEFAULT NOW(),
-    updated_at TIMESTAMP NOT NULL DEFAULT NOW(),
+    created_at TIMESTAMPTZ NOT NULL DEFAULT NOW(),
+    updated_at TIMESTAMPTZ NOT NULL DEFAULT NOW(),
     CONSTRAINT fk_file_blob
         FOREIGN KEY (blob_id) REFERENCES blobs(id) ON DELETE CASCADE
 );

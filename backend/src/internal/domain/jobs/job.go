@@ -39,4 +39,5 @@ type Job struct {
 	Budget      float64   `json:"budget" gorm:"not null"`
 	CreatedAt   time.Time `json:"created_at" gorm:"autoCreateTime"`
 	UpdatedAt   time.Time `json:"updated_at" gorm:"autoUpdateTime"`
+	IsActive    bool      `json:"is_active" gorm:"not null;default:true"`
 }
