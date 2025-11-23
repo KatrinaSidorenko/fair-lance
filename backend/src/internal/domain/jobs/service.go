@@ -35,7 +35,12 @@ func (s *jobService) CreateJob(job *Job) error {
 		return fmt.Errorf("unsupported currency: %s", job.Currency)
 	}
 
-	FixBudgetAndCurrency([]*Job{job}, helpers.DefaultCurrency)
+	convertedAmount, err := helpers.ToWei(job.Budget, job.Currency)
+	if err != nil {
+		return fmt.Errorf("failed to convert budget to wei: %w", err)
+	}
+	job.Budget = convertedAmount
+	job.Currency = helpers.DefaultCurrency
 	return s.jobRepository.Create(job)
 }
 
@@ -63,6 +68,7 @@ func (s *jobService) UpdateJob(dto *UpdateJobDto) error {
 		return gorm.ErrRecordNotFound
 	}
 
+	// toso: stupid but let it be for now
 	if dto.Title != nil {
 		existingJob.Title = *dto.Title
 	}
@@ -94,7 +100,7 @@ func (s *jobService) UpdateJob(dto *UpdateJobDto) error {
 			return fmt.Errorf("failed to convert budget to wei: %w", err)
 		}
 		existingJob.Budget = convertedAmount
-		existingJob.Currency = newCurrency
+		existingJob.Currency = helpers.DefaultCurrency
 	}
 	if dto.Status != nil {
 		parsedStatus, err := ParseJobStatus(*dto.Status)

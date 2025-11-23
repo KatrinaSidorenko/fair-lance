@@ -19,6 +19,7 @@ func NewJobApplicationService(repo JobApplicationRepository) JobApplicationServi
 	return &jobApplicationService{repo: repo}
 }
 
+// todo: job application only for publichsed jobs
 func (s *jobApplicationService) CreateApplication(application *JobApplication) error {
 	existsingApp, err := s.repo.GetByJobAndFreelancer(application.JobID, application.FreelancerID)
 	if err != nil {

@@ -8,11 +8,12 @@ import (
 )
 
 func RegisterJobSubmitRoutes(rg *gin.RouterGroup, handler *JobSubmitHandler, tokenManager *auth.TokenManager) {
-	api := rg.Group("/job_submits")
+	api := rg.Group("/jobsubmits")
 
 	protected := api.Group("")
-	protected.Use(auth.JWTAuthMiddleware(tokenManager))
+	protected.GET("/application/:application_id", handler.GetAllByApplicationID)
 
+	protected.Use(auth.JWTAuthMiddleware(tokenManager))
 	{
 		// freelancer endpoints
 		freelancer := protected.Group("")
@@ -20,7 +21,6 @@ func RegisterJobSubmitRoutes(rg *gin.RouterGroup, handler *JobSubmitHandler, tok
 		{
 			freelancer.POST("", handler.CreateSubmit)
 			freelancer.GET("/:id", handler.GetSubmitByID)
-			freelancer.GET("/:application_id", handler.GetAllByApplicationID)
 		}
 	}
 
@@ -30,7 +30,6 @@ func RegisterJobSubmitRoutes(rg *gin.RouterGroup, handler *JobSubmitHandler, tok
 		employer.Use(roles.RequireRoles(roles.EMPLOYER, roles.ADMIN))
 		{
 			employer.GET("/job/:job_id", handler.GetAllByJobID)
-			employer.GET("/:application_id", handler.GetAllByApplicationID)
 		}
 	}
 }

@@ -49,7 +49,7 @@ func main() {
 	jobApplicationHandler := jobapplications.NewJobApplicationHandler(jobApplicationService)
 
 	jobSubmitRepo := jobSubmit.NewJobSubmitRepository(database)
-	jobSubmitService := jobSubmit.NewJobSubmitService(jobSubmitRepo)
+	jobSubmitService := jobSubmit.NewJobSubmitService(jobSubmitRepo, jobApplicationRepo)
 	jobSubmitHandler := jobSubmit.NewJobSubmitHandler(jobSubmitService)
 
 	eventsRepository := events.NewEventRepository(database)

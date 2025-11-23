@@ -5,7 +5,7 @@ import "time"
 type CreateJobSubmitDTO struct {
 	ApplicationID uint   `json:"application_id" binding:"required"`
 	Description   string `json:"description" binding:"required"`
-	FileId        uint   `json:"file_id"` // optional
+	FileId        *uint  `json:"file_id"`
 }
 
 type JobSubmitResponseDTO struct {
@@ -13,7 +13,7 @@ type JobSubmitResponseDTO struct {
 	JobApplicationID uint      `json:"job_application_id"`
 	SubmittedAt      time.Time `json:"submitted_at"`
 	Description      string    `json:"description"`
-	FileId           uint      `json:"file_id"`
+	FileId           *uint     `json:"file_id"`
 }
 
 // MAPPERS

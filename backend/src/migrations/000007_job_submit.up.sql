@@ -3,7 +3,7 @@ CREATE TABLE job_submits (
     job_application_id INT NOT NULL,
     submitted_at TIMESTAMPTZ DEFAULT NOW(),
     description TEXT NOT NULL,
-    file_id INT,
+    file_id INT DEFAULT NULL,
     created_at TIMESTAMPTZ DEFAULT NOW(),
     updated_at TIMESTAMPTZ DEFAULT NOW(),
     CONSTRAINT fk_job_submit_application

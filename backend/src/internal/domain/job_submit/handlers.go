@@ -25,7 +25,7 @@ func (h *JobSubmitHandler) CreateSubmit(c *gin.Context) {
 	sub := ToJobSubmit(&dto)
 
 	if err := h.service.CreateSubmit(sub); err != nil {
-		c.JSON(http.StatusInternalServerError, gin.H{"error": "failed to create submit"})
+		c.JSON(http.StatusInternalServerError, gin.H{"error": err.Error()})
 		return
 	}
 
