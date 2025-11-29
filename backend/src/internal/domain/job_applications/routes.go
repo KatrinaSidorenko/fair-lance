@@ -19,6 +19,7 @@ func RegisterJobApplicationRoutes(rg *gin.RouterGroup, handler *JobApplicationHa
 		{
 			freelancer.POST("", handler.CreateJobApplication)
 			freelancer.GET("/:id", handler.GetJobApplicationByID)
+			freelancer.GET("", handler.GetFreelancerJobApplications)
 		}
 	}
 

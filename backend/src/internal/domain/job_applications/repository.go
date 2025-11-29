@@ -10,6 +10,7 @@ type JobApplicationRepository interface {
 	Update(application *JobApplication) error
 	GetByJobAndFreelancer(jobID uint, freelancerID uint) (*JobApplication, error)
 	GetAllByJobID(jobID uint) ([]*JobApplication, error)
+	GetByUserID(userID uint) ([]*JobApplication, error)
 }
 
 type jobApplicationRepository struct {
@@ -59,6 +60,14 @@ func (r *jobApplicationRepository) GetByJobAndFreelancer(jobID uint, freelancerI
 func (r *jobApplicationRepository) GetAllByJobID(jobID uint) ([]*JobApplication, error) {
 	var applications []*JobApplication
 	if err := r.db.Where("job_id = ?", jobID).Find(&applications).Error; err != nil {
+		return nil, err
+	}
+	return applications, nil
+}
+
+func (r *jobApplicationRepository) GetByUserID(userID uint) ([]*JobApplication, error) {
+	var applications []*JobApplication
+	if err := r.db.Where("freelancer_id = ?", userID).Find(&applications).Error; err != nil {
 		return nil, err
 	}
 	return applications, nil
