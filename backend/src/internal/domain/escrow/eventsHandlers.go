@@ -30,17 +30,42 @@ func StartEventListener(cfg *configs.Config, eventsRepository *events.EventRepos
 
 	log.Println("✅ Connected to blockchain. Starting EscrowManager event listeners...")
 
-	ctx := context.Background()
+	ctx, cancel := context.WithCancel(context.Background())
+	defer cancel()
 
 	latestBlock, _ := eventsRepository.GetLatestBlockNumber()
 	startBlock := latestBlock
-	const (
-		batchSize    = 10              // number of blocks to scan per batch
-		tickInterval = 5 * time.Second // polling frequency
-	)
 
-	go StartJobPublishedPolling(ctx, client, esc, eventsRepository, startBlock, batchSize, tickInterval)
-	go StartJobApprovedPolling(ctx, client, esc, eventsRepository, startBlock, batchSize, tickInterval)
-	go StartWithdrawnPolling(ctx, client, esc, eventsRepository, startBlock, batchSize, tickInterval)
-	go StartJobAssignedPolling(ctx, client, esc, eventsRepository, startBlock, batchSize, tickInterval)
+	eventsChan := make(chan []*events.BlockchainEvent, 100)
+	errorChan := make(chan error, 10)
+
+	batchSize := uint64(10)
+	tickInterval := 5 * time.Second
+
+	SafeGo(func() {
+		StartJobPublishedPolling(ctx, client, esc, eventsChan, errorChan, startBlock, batchSize, tickInterval)
+	}, errorChan)
+
+	SafeGo(func() {
+		StartJobApprovedPolling(ctx, client, esc, eventsChan, errorChan, startBlock, batchSize, tickInterval)
+	}, errorChan)
+
+	SafeGo(func() {
+		StartWithdrawnPolling(ctx, client, esc, eventsChan, errorChan, startBlock, batchSize, tickInterval)
+	}, errorChan)
+
+	SafeGo(func() {
+		StartJobAssignedPolling(ctx, client, esc, eventsChan, errorChan, startBlock, batchSize, tickInterval)
+	}, errorChan)
+
+	for {
+		select {
+		case evts := <-eventsChan:
+			if err := eventsRepository.SaveEvents(evts); err != nil {
+				log.Println("❌ Save events error:", err)
+			}
+		case err := <-errorChan:
+			log.Println("🚨 FATAL worker error:", err)
+		}
+	}
 }

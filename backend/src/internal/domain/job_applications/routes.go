@@ -8,7 +8,7 @@ import (
 )
 
 func RegisterJobApplicationRoutes(rg *gin.RouterGroup, handler *JobApplicationHandler, tokenManager *auth.TokenManager) {
-	api := rg.Group("/job_applications")
+	api := rg.Group("/jobapplications")
 
 	protected := api.Group("")
 	protected.Use(auth.JWTAuthMiddleware(tokenManager))
@@ -19,6 +19,7 @@ func RegisterJobApplicationRoutes(rg *gin.RouterGroup, handler *JobApplicationHa
 		{
 			freelancer.POST("", handler.CreateJobApplication)
 			freelancer.GET("/:id", handler.GetJobApplicationByID)
+			freelancer.GET("", handler.GetFreelancerJobApplications)
 		}
 	}
 

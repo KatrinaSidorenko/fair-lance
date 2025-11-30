@@ -94,3 +94,23 @@ func (h *JobApplicationHandler) AcceptJobApplication(c *gin.Context) {
 	}
 	c.JSON(http.StatusOK, gin.H{"message": "Job application accepted"})
 }
+
+func (h *JobApplicationHandler) GetFreelancerJobApplications(c *gin.Context) {
+	userIDValue, exists := c.Get("user_id")
+	if !exists {
+		c.JSON(http.StatusInternalServerError, gin.H{"error": "user id not found in context"})
+		return
+	}
+	userID := userIDValue.(uint)
+	applications, err := h.service.GetApplicationsByUserID(userID)
+	if err != nil {
+		c.JSON(http.StatusInternalServerError, gin.H{"error": "Failed to get job applications"})
+		return
+	}
+	var responseDTOs []JobApplicationResponseDTO
+	for _, app := range applications {
+		responseDTOs = append(responseDTOs, *ToJobApplicationResponseDTO(app))
+	}
+
+	c.JSON(http.StatusOK, responseDTOs)
+}

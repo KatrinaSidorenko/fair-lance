@@ -9,6 +9,7 @@ type JobApplicationService interface {
 	GetApplicationByJobAndFreelancer(jobID uint, freelancerID uint) (*JobApplication, error)
 	GetAllApplicationsByJobID(jobID uint) ([]*JobApplication, error)
 	AcceptJobApplication(applicationID uint) error
+	GetApplicationsByUserID(userID uint) ([]*JobApplication, error)
 }
 
 type jobApplicationService struct {
@@ -19,6 +20,7 @@ func NewJobApplicationService(repo JobApplicationRepository) JobApplicationServi
 	return &jobApplicationService{repo: repo}
 }
 
+// todo: job application only for publichsed jobs
 func (s *jobApplicationService) CreateApplication(application *JobApplication) error {
 	existsingApp, err := s.repo.GetByJobAndFreelancer(application.JobID, application.FreelancerID)
 	if err != nil {
@@ -65,4 +67,8 @@ func (s *jobApplicationService) AcceptJobApplication(applicationID uint) error {
 
 	application.Status = string(ApplicationStatusAccepted)
 	return s.repo.Update(application)
+}
+
+func (s *jobApplicationService) GetApplicationsByUserID(userID uint) ([]*JobApplication, error) {
+	return s.repo.GetByUserID(userID)
 }

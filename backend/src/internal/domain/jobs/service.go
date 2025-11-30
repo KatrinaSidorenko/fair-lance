@@ -26,9 +26,24 @@ func NewJobService(repo JobRepository) JobService {
 }
 
 func (s *jobService) CreateJob(job *Job) error {
-	// todo: add time check
+	currentDate := helpers.GetCurrentTimeUTC()
+	if job.DueDate.Before(currentDate) {
+		return fmt.Errorf("due date must be in the future")
+	}
+
+	if !helpers.IsCurrencySupported(job.Currency) {
+		return fmt.Errorf("unsupported currency: %s", job.Currency)
+	}
+
+	convertedAmount, err := helpers.ToWei(job.Budget, job.Currency)
+	if err != nil {
+		return fmt.Errorf("failed to convert budget to wei: %w", err)
+	}
+	job.Budget = convertedAmount
+	job.Currency = helpers.DefaultCurrency
 	return s.jobRepository.Create(job)
 }
+
 func (s *jobService) GetJobByID(id uint) (*Job, error) {
 	job, err := s.jobRepository.GetByID(id)
 	if err != nil {
@@ -37,8 +52,13 @@ func (s *jobService) GetJobByID(id uint) (*Job, error) {
 	if !job.IsActive {
 		return nil, gorm.ErrRecordNotFound
 	}
+	err = FixBudgetAndCurrency([]*Job{job}, helpers.DefaultCurrencyDisplay)
+	if err != nil {
+		return nil, err
+	}
 	return job, nil
 }
+
 func (s *jobService) UpdateJob(dto *UpdateJobDto) error {
 	existingJob, err := s.jobRepository.GetByID(dto.ID)
 	if err != nil {
@@ -48,6 +68,7 @@ func (s *jobService) UpdateJob(dto *UpdateJobDto) error {
 		return gorm.ErrRecordNotFound
 	}
 
+	// toso: stupid but let it be for now
 	if dto.Title != nil {
 		existingJob.Title = *dto.Title
 	}
@@ -61,11 +82,25 @@ func (s *jobService) UpdateJob(dto *UpdateJobDto) error {
 		}
 		existingJob.DueDate = parsedDueTime
 	}
-	if dto.Budget != nil {
-		existingJob.Budget = *dto.Budget
-	}
-	if dto.Currency != nil {
-		existingJob.Currency = *dto.Currency
+	if dto.Budget != nil || dto.Currency != nil {
+		newCurrency := existingJob.Currency
+		if dto.Currency != nil {
+			if !helpers.IsCurrencySupported(*dto.Currency) {
+				return fmt.Errorf("unsupported currency: %s", *dto.Currency)
+			}
+			newCurrency = *dto.Currency
+		}
+		newBudget := existingJob.Budget
+		if dto.Budget != nil {
+			newBudget = *dto.Budget
+		}
+		// convert to wei for storage
+		convertedAmount, err := helpers.ToWei(newBudget, newCurrency)
+		if err != nil {
+			return fmt.Errorf("failed to convert budget to wei: %w", err)
+		}
+		existingJob.Budget = convertedAmount
+		existingJob.Currency = helpers.DefaultCurrency
 	}
 	if dto.Status != nil {
 		parsedStatus, err := ParseJobStatus(*dto.Status)
@@ -105,7 +140,25 @@ func (s *jobService) GetAllUserJobs(userId uint) ([]*Job, error) {
 			activeJobs = append(activeJobs, job)
 		}
 	}
+
+	err = FixBudgetAndCurrency(activeJobs, helpers.DefaultCurrencyDisplay)
+	if err != nil {
+		return nil, err
+	}
+
 	return activeJobs, nil
+}
+
+func FixBudgetAndCurrency(jobs []*Job, targetCurrency string) error {
+	for _, job := range jobs {
+		convertedAmount, err := helpers.FromWei(job.Budget, targetCurrency)
+		if err != nil {
+			return fmt.Errorf("failed to convert budget from wei: %w", err)
+		}
+		job.Budget = convertedAmount
+		job.Currency = targetCurrency
+	}
+	return nil
 }
 
 func (s *jobService) GetPublishedJobs() ([]*Job, error) {
@@ -113,6 +166,11 @@ func (s *jobService) GetPublishedJobs() ([]*Job, error) {
 	if err != nil {
 		return nil, fmt.Errorf("failed to get published jobs: %w", err)
 	}
+
+	err = FixBudgetAndCurrency(jobs, helpers.DefaultCurrencyDisplay)
+	if err != nil {
+		return nil, err
+	}
+
 	return jobs, nil
 }
-

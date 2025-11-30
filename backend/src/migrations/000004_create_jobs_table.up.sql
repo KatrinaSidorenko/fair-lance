@@ -6,7 +6,7 @@ CREATE TABLE jobs (
     due_date TIMESTAMPTZ NOT NULL,
     employer_id INT NOT NULL,
     currency VARCHAR(10) NOT NULL,
-    budget NUMERIC(15, 2) NOT NULL,
+    budget NUMERIC(78,1) NOT NULL,
     created_at TIMESTAMPTZ DEFAULT NOW(),
     updated_at TIMESTAMPTZ DEFAULT NOW(),
     is_active BOOLEAN NOT NULL DEFAULT TRUE,

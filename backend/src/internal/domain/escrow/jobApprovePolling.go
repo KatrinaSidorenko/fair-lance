@@ -32,7 +32,7 @@ func ProcessJobApprovedEvents(events0 []*EscrowJobApproved) ([]*events.Blockchai
 		processedEvents = append(processedEvents, &events.BlockchainEvent{
 			EventType:   events.JobApprovedEventType,
 			JobID:       uint(e.JobId.Int64()),
-			Amount:      e.Amount.String(),
+			Amount:      e.Amount.String(), // in wei
 			TxHash:      e.Raw.TxHash.Hex(),
 			BlockNumber: e.Raw.BlockNumber,
 			BlockHash:   e.Raw.BlockHash.Hex(),
@@ -46,7 +46,8 @@ func StartJobApprovedPolling(
 	ctx context.Context,
 	client *ethclient.Client,
 	esc *Escrow,
-	eventsRepository *events.EventRepository,
+	eventsChan chan<- []*events.BlockchainEvent,
+	errorChan chan<- error,
 	startBlock uint64,
 	batchSize uint64,
 	tickInterval time.Duration,
@@ -55,7 +56,8 @@ func StartJobApprovedPolling(
 		ctx,
 		client,
 		esc,
-		eventsRepository,
+		eventsChan,    
+		errorChan,     
 		startBlock,
 		batchSize,
 		tickInterval,
@@ -63,3 +65,4 @@ func StartJobApprovedPolling(
 		ProcessJobApprovedEvents,
 	)
 }
+
