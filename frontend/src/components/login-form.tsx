@@ -1,48 +1,53 @@
-"use client"
+"use client";
 
-import { useState } from "react"
-import { useRouter } from "next/navigation"
-import { cn } from "@/lib/utils"
-import { Button } from "@/components/ui/button"
+import { useState } from "react";
+import { useRouter } from "next/navigation";
+import { cn } from "@/lib/utils";
+import { Button } from "@/components/ui/button";
 import {
   Field,
   FieldDescription,
   FieldGroup,
   FieldLabel,
   FieldSeparator,
-} from "@/components/ui/field"
-import { Input } from "@/components/ui/input"
-import { api } from "@/lib/api"
-import { setAuthToken } from "@/lib/auth"
+} from "@/components/ui/field";
+import { Input } from "@/components/ui/input";
+import { api } from "@/lib/api";
+import { useAuth } from "@/lib/auth-context";
 
 export function LoginForm({
   className,
   ...props
 }: React.ComponentProps<"form">) {
-  const router = useRouter()
-  const [email, setEmail] = useState("")
-  const [password, setPassword] = useState("")
-  const [error, setError] = useState("")
-  const [loading, setLoading] = useState(false)
+  const router = useRouter();
+  const { login } = useAuth();
+  const [email, setEmail] = useState("");
+  const [password, setPassword] = useState("");
+  const [error, setError] = useState("");
+  const [loading, setLoading] = useState(false);
 
   const handleSubmit = async (e: React.FormEvent) => {
-    e.preventDefault()
-    setError("")
-    setLoading(true)
+    e.preventDefault();
+    setError("");
+    setLoading(true);
 
     try {
-      const response = await api.login({ email, password })
-      setAuthToken(response.token)
-      router.push("/dashboard")
+      const response = await api.login({ email, password });
+      await login(response.token);
+      router.push("/dashboard");
     } catch (err) {
-      setError(err instanceof Error ? err.message : "Login failed")
+      setError(err instanceof Error ? err.message : "Login failed");
     } finally {
-      setLoading(false)
+      setLoading(false);
     }
-  }
+  };
 
   return (
-    <form className={cn("flex flex-col gap-6", className)} onSubmit={handleSubmit} {...props}>
+    <form
+      className={cn("flex flex-col gap-6", className)}
+      onSubmit={handleSubmit}
+      {...props}
+    >
       <FieldGroup>
         <div className="flex flex-col items-center gap-1 text-center">
           <h1 className="text-2xl font-bold">Login to your account</h1>
@@ -51,7 +56,7 @@ export function LoginForm({
           </p>
         </div>
         {error && (
-          <div className="p-3 text-sm text-red-600 bg-red-50 rounded-md">
+          <div className="p-3 text-sm text-red-600 bg-red-50 dark:bg-red-950/50 rounded-md">
             {error}
           </div>
         )}
@@ -87,7 +92,7 @@ export function LoginForm({
           />
         </Field>
         <Field>
-          <Button type="submit" disabled={loading}>
+          <Button type="submit" disabled={loading} className="w-full">
             {loading ? "Logging in..." : "Login"}
           </Button>
         </Field>
@@ -102,5 +107,5 @@ export function LoginForm({
         </Field>
       </FieldGroup>
     </form>
-  )
+  );
 }

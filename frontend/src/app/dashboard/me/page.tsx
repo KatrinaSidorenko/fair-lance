@@ -1,8 +1,8 @@
-"use client"
+"use client";
 
-import { useEffect, useState } from "react"
-import { useRouter } from "next/navigation"
-import { AppSidebar } from "@/components/app-sidebar"
+import { useEffect } from "react";
+import { useRouter } from "next/navigation";
+import { AppSidebar } from "@/components/app-sidebar";
 import {
   Breadcrumb,
   BreadcrumbItem,
@@ -10,58 +10,42 @@ import {
   BreadcrumbList,
   BreadcrumbPage,
   BreadcrumbSeparator,
-} from "@/components/ui/breadcrumb"
-import { Separator } from "@/components/ui/separator"
+} from "@/components/ui/breadcrumb";
+import { Separator } from "@/components/ui/separator";
 import {
   SidebarInset,
   SidebarProvider,
   SidebarTrigger,
-} from "@/components/ui/sidebar"
-import { api, UserResponse } from "@/lib/api"
-import { isAuthenticated, logout } from "@/lib/auth"
-import { Button } from "@/components/ui/button"
+} from "@/components/ui/sidebar";
+import { Button } from "@/components/ui/button";
+import { Badge } from "@/components/ui/badge";
+import { useAuth, getRoleDisplayName } from "@/lib/auth-context";
+import { Loader2, User, Mail, Shield, LogOut } from "lucide-react";
 
 export default function MePage() {
-  const router = useRouter()
-  const [user, setUser] = useState<UserResponse | null>(null)
-  const [loading, setLoading] = useState(true)
-  const [error, setError] = useState("")
+  const router = useRouter();
+  const { user, isAuthenticated, isLoading, logout } = useAuth();
 
   useEffect(() => {
-    if (!isAuthenticated()) {
-      router.push("/login")
-      return
+    if (!isLoading && !isAuthenticated) {
+      router.push("/login");
     }
-
-    const fetchUser = async () => {
-      try {
-        const data = await api.getMe()
-        setUser(data)
-      } catch (err) {
-        setError(err instanceof Error ? err.message : "Failed to fetch user")
-      } finally {
-        setLoading(false)
-      }
-    }
-
-    fetchUser()
-  }, [router])
-
-  const getRoleName = (roleId: number) => {
-    switch (roleId) {
-      case 1:
-        return "Employer"
-      case 2:
-        return "Freelancer"
-      case 3:
-        return "Admin"
-      default:
-        return "Unknown"
-    }
-  }
+  }, [isLoading, isAuthenticated, router]);
 
   const handleLogout = () => {
-    logout()
+    logout();
+  };
+
+  if (isLoading) {
+    return (
+      <div className="flex items-center justify-center min-h-screen">
+        <Loader2 className="h-8 w-8 animate-spin text-primary" />
+      </div>
+    );
+  }
+
+  if (!isAuthenticated || !user) {
+    return null;
   }
 
   return (
@@ -92,58 +76,71 @@ export default function MePage() {
           <div className="rounded-lg border bg-card">
             <div className="p-6">
               <h2 className="text-2xl font-bold mb-6">My Profile</h2>
-              {loading && (
-                <div className="text-center py-8">Loading profile...</div>
-              )}
-              {error && (
-                <div className="p-4 text-sm text-red-600 bg-red-50 rounded-md mb-4">
-                  {error}
-                </div>
-              )}
-              {!loading && !error && user && (
-                <div className="space-y-6">
-                  <div className="grid gap-4 md:grid-cols-2">
-                    <div className="space-y-2">
-                      <label className="text-sm font-medium text-muted-foreground">
-                        User ID
-                      </label>
-                      <p className="text-lg">{user.id}</p>
-                    </div>
-                    <div className="space-y-2">
-                      <label className="text-sm font-medium text-muted-foreground">
-                        Username
-                      </label>
-                      <p className="text-lg">{user.username}</p>
-                    </div>
-                    <div className="space-y-2">
-                      <label className="text-sm font-medium text-muted-foreground">
-                        Email
-                      </label>
-                      <p className="text-lg">{user.email}</p>
-                    </div>
-                    <div className="space-y-2">
-                      <label className="text-sm font-medium text-muted-foreground">
-                        Account Type
-                      </label>
-                      <div>
-                        <span className="inline-flex items-center rounded-full px-3 py-1 text-sm font-medium bg-blue-100 text-blue-800">
-                          {getRoleName(user.role_id)}
-                        </span>
-                      </div>
-                    </div>
+
+              <div className="space-y-6">
+                <div className="flex items-center gap-6">
+                  <div className="h-20 w-20 rounded-full bg-primary/10 flex items-center justify-center">
+                    <span className="text-2xl font-bold text-primary">
+                      {user.username.slice(0, 2).toUpperCase()}
+                    </span>
                   </div>
-                  <Separator />
-                  <div className="flex gap-4">
-                    <Button variant="outline" onClick={handleLogout}>
-                      Logout
-                    </Button>
+                  <div>
+                    <h3 className="text-xl font-semibold">{user.username}</h3>
+                    <Badge className="mt-1">{getRoleDisplayName(user.role_id)}</Badge>
                   </div>
                 </div>
-              )}
+
+                <Separator />
+
+                <div className="grid gap-6 md:grid-cols-2">
+                  <div className="space-y-2">
+                    <div className="flex items-center gap-2 text-muted-foreground">
+                      <User className="h-4 w-4" />
+                      <span className="text-sm font-medium">User ID</span>
+                    </div>
+                    <p className="text-lg font-mono">{user.id}</p>
+                  </div>
+
+                  <div className="space-y-2">
+                    <div className="flex items-center gap-2 text-muted-foreground">
+                      <User className="h-4 w-4" />
+                      <span className="text-sm font-medium">Username</span>
+                    </div>
+                    <p className="text-lg">{user.username}</p>
+                  </div>
+
+                  <div className="space-y-2">
+                    <div className="flex items-center gap-2 text-muted-foreground">
+                      <Mail className="h-4 w-4" />
+                      <span className="text-sm font-medium">Email</span>
+                    </div>
+                    <p className="text-lg">{user.email}</p>
+                  </div>
+
+                  <div className="space-y-2">
+                    <div className="flex items-center gap-2 text-muted-foreground">
+                      <Shield className="h-4 w-4" />
+                      <span className="text-sm font-medium">Account Type</span>
+                    </div>
+                    <Badge variant="outline" className="text-base px-3 py-1">
+                      {getRoleDisplayName(user.role_id)}
+                    </Badge>
+                  </div>
+                </div>
+
+                <Separator />
+
+                <div className="flex gap-4">
+                  <Button variant="destructive" onClick={handleLogout}>
+                    <LogOut className="h-4 w-4 mr-2" />
+                    Logout
+                  </Button>
+                </div>
+              </div>
             </div>
           </div>
         </div>
       </SidebarInset>
     </SidebarProvider>
-  )
+  );
 }

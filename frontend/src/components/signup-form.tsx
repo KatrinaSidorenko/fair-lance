@@ -1,81 +1,86 @@
-"use client"
+"use client";
 
-import { useState, useEffect } from "react"
-import { useRouter } from "next/navigation"
-import { cn } from "@/lib/utils"
-import { Button } from "@/components/ui/button"
+import { useState } from "react";
+import { useRouter } from "next/navigation";
+import { cn } from "@/lib/utils";
+import { Button } from "@/components/ui/button";
 import {
   Field,
   FieldDescription,
   FieldGroup,
   FieldLabel,
   FieldSeparator,
-} from "@/components/ui/field"
-import { Input } from "@/components/ui/input"
-import { api } from "@/lib/api"
-import { setAuthToken } from "@/lib/auth"
+} from "@/components/ui/field";
+import { Input } from "@/components/ui/input";
+import { api } from "@/lib/api";
+import { useAuth } from "@/lib/auth-context";
 
 interface Role {
-  id: number
-  name: string
+  id: number;
+  name: string;
 }
 
 export function SignupForm({
   className,
   ...props
 }: React.ComponentProps<"form">) {
-  const router = useRouter()
-  const [username, setUsername] = useState("")
-  const [email, setEmail] = useState("")
-  const [password, setPassword] = useState("")
-  const [confirmPassword, setConfirmPassword] = useState("")
-  const [roleId, setRoleId] = useState<number>(1)
-  const [roles, setRoles] = useState<Role[]>([
+  const router = useRouter();
+  const { login } = useAuth();
+  const [username, setUsername] = useState("");
+  const [email, setEmail] = useState("");
+  const [password, setPassword] = useState("");
+  const [confirmPassword, setConfirmPassword] = useState("");
+  const [roleId, setRoleId] = useState<number>(1);
+  const [roles] = useState<Role[]>([
     { id: 1, name: "employer" },
     { id: 2, name: "freelancer" },
-  ])
-  const [error, setError] = useState("")
-  const [loading, setLoading] = useState(false)
+  ]);
+  const [error, setError] = useState("");
+  const [loading, setLoading] = useState(false);
 
   const handleSubmit = async (e: React.FormEvent) => {
-    e.preventDefault()
-    setError("")
+    e.preventDefault();
+    setError("");
 
     // Validate passwords match
     if (password !== confirmPassword) {
-      setError("Passwords do not match")
-      return
+      setError("Passwords do not match");
+      return;
     }
 
     // Validate password length
     if (password.length < 6) {
-      setError("Password must be at least 6 characters long")
-      return
+      setError("Password must be at least 6 characters long");
+      return;
     }
 
-    setLoading(true)
+    setLoading(true);
 
     try {
-      const response = await api.signup({
+      await api.signup({
         username,
         email,
         password,
         role_id: roleId,
-      })
+      });
 
       // After successful signup, login the user
-      const loginResponse = await api.login({ email, password })
-      setAuthToken(loginResponse.token)
-      router.push("/dashboard")
+      const loginResponse = await api.login({ email, password });
+      await login(loginResponse.token);
+      router.push("/dashboard");
     } catch (err) {
-      setError(err instanceof Error ? err.message : "Signup failed")
+      setError(err instanceof Error ? err.message : "Signup failed");
     } finally {
-      setLoading(false)
+      setLoading(false);
     }
-  }
+  };
 
   return (
-    <form className={cn("flex flex-col gap-6", className)} onSubmit={handleSubmit} {...props}>
+    <form
+      className={cn("flex flex-col gap-6", className)}
+      onSubmit={handleSubmit}
+      {...props}
+    >
       <FieldGroup>
         <div className="flex flex-col items-center gap-1 text-center">
           <h1 className="text-2xl font-bold">Create your account</h1>
@@ -84,7 +89,7 @@ export function SignupForm({
           </p>
         </div>
         {error && (
-          <div className="p-3 text-sm text-red-600 bg-red-50 rounded-md">
+          <div className="p-3 text-sm text-red-600 bg-red-50 dark:bg-red-950/50 rounded-md">
             {error}
           </div>
         )}
@@ -162,17 +167,20 @@ export function SignupForm({
           <FieldDescription>Please confirm your password.</FieldDescription>
         </Field>
         <Field>
-          <Button type="submit" disabled={loading}>
+          <Button type="submit" disabled={loading} className="w-full">
             {loading ? "Creating account..." : "Create Account"}
           </Button>
         </Field>
         <FieldSeparator>Or continue with</FieldSeparator>
         <Field>
           <FieldDescription className="px-6 text-center">
-            Already have an account? <a href="/login" className="underline underline-offset-4">Sign in</a>
+            Already have an account?{" "}
+            <a href="/login" className="underline underline-offset-4">
+              Sign in
+            </a>
           </FieldDescription>
         </Field>
       </FieldGroup>
     </form>
-  )
+  );
 }
