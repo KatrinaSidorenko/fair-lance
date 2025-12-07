@@ -1,13 +1,13 @@
 export function setAuthToken(token: string): void {
-  localStorage.setItem('token', token);
+  localStorage.setItem("token", token);
 }
 
 export function getAuthToken(): string | null {
-  return localStorage.getItem('token');
+  return localStorage.getItem("token");
 }
 
 export function removeAuthToken(): void {
-  localStorage.removeItem('token');
+  localStorage.removeItem("token");
 }
 
 export function isAuthenticated(): boolean {
@@ -16,5 +16,5 @@ export function isAuthenticated(): boolean {
 
 export function logout(): void {
   removeAuthToken();
-  window.location.href = '/login';
+  window.location.href = "/login";
 }

@@ -1,18 +1,19 @@
-import Link from "next/link";
-import { Button } from "@/components/ui/button";
-import { ThemeSwitcher } from "@/components/theme-switcher";
+import { LandingNavbar } from "@/components/landing/navbar";
+import { HeroSection } from "@/components/landing/hero";
+import { FeaturesSection } from "@/components/landing/features";
+import { HowItWorksSection } from "@/components/landing/how-it-works";
+import { CTASection } from "@/components/landing/cta";
+import { LandingFooter } from "@/components/landing/footer";
 
 export default function Home() {
   return (
-    <div className="font-sans flex items-center justify-center min-h-screen bg-background">
-      <div className="absolute top-4 right-4">
-        <ThemeSwitcher />
-      </div>
-      <Link
-        href="/login">
-        <Button variant="default">Login</Button>
-      </Link>
-
+    <div className="min-h-screen">
+      <LandingNavbar />
+      <HeroSection />
+      <FeaturesSection />
+      <HowItWorksSection />
+      <CTASection />
+      <LandingFooter />
     </div>
   );
 }

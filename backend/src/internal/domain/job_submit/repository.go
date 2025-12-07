@@ -53,7 +53,10 @@ func (r *jobSubmitRepository) GetAllByApplicationID(applicationID uint) ([]*JobS
 
 func (r *jobSubmitRepository) GetAllByJobID(jobID uint) ([]*JobSubmit, error) {
 	var subs []*JobSubmit
-	if err := r.db.Where("job_id = ?", jobID).Find(&subs).Error; err != nil {
+	if err := r.db.
+		Joins("JOIN job_applications ON job_applications.id = job_submits.job_application_id").
+		Where("job_applications.job_id = ?", jobID).
+		Find(&subs).Error; err != nil {
 		return nil, err
 	}
 	return subs, nil

@@ -1,8 +1,8 @@
-"use client"
+"use client";
 
-import { useEffect, useState } from "react"
-import { useRouter } from "next/navigation"
-import { AppSidebar } from "@/components/app-sidebar"
+import { useEffect, useState } from "react";
+import { useRouter } from "next/navigation";
+import { AppSidebar } from "@/components/app-sidebar";
 import {
   Breadcrumb,
   BreadcrumbItem,
@@ -10,53 +10,64 @@ import {
   BreadcrumbList,
   BreadcrumbPage,
   BreadcrumbSeparator,
-} from "@/components/ui/breadcrumb"
-import { Separator } from "@/components/ui/separator"
+} from "@/components/ui/breadcrumb";
+import { Separator } from "@/components/ui/separator";
 import {
   SidebarInset,
   SidebarProvider,
   SidebarTrigger,
-} from "@/components/ui/sidebar"
-import { api, UserResponse } from "@/lib/api"
-import { isAuthenticated } from "@/lib/auth"
+} from "@/components/ui/sidebar";
+import { Badge } from "@/components/ui/badge";
+import { api, UserResponse } from "@/lib/api";
+import { useAuth, getRoleDisplayName } from "@/lib/auth-context";
+import { Loader2, AlertCircle } from "lucide-react";
 
 export default function UsersPage() {
-  const router = useRouter()
-  const [users, setUsers] = useState<UserResponse[]>([])
-  const [loading, setLoading] = useState(true)
-  const [error, setError] = useState("")
+  const router = useRouter();
+  const { isAuthenticated, isLoading: authLoading, userRole } = useAuth();
+  const [users, setUsers] = useState<UserResponse[]>([]);
+  const [loading, setLoading] = useState(true);
+  const [error, setError] = useState("");
 
   useEffect(() => {
-    if (!isAuthenticated()) {
-      router.push("/login")
-      return
+    if (!authLoading && !isAuthenticated) {
+      router.push("/login");
+      return;
     }
+
+    if (!authLoading && isAuthenticated && userRole !== "admin") {
+      router.push("/dashboard");
+      return;
+    }
+  }, [authLoading, isAuthenticated, userRole, router]);
+
+  useEffect(() => {
+    if (!isAuthenticated || userRole !== "admin") return;
 
     const fetchUsers = async () => {
       try {
-        const data = await api.getAllUsers()
-        setUsers(data)
+        const data = await api.getAllUsers();
+        setUsers(data || []);
       } catch (err) {
-        setError(err instanceof Error ? err.message : "Failed to fetch users")
+        setError(err instanceof Error ? err.message : "Failed to fetch users");
       } finally {
-        setLoading(false)
+        setLoading(false);
       }
-    }
+    };
 
-    fetchUsers()
-  }, [router])
+    fetchUsers();
+  }, [isAuthenticated, userRole]);
 
-  const getRoleName = (roleId: number) => {
-    switch (roleId) {
-      case 1:
-        return "Employer"
-      case 2:
-        return "Freelancer"
-      case 3:
-        return "Admin"
-      default:
-        return "Unknown"
-    }
+  if (authLoading || (!isAuthenticated)) {
+    return (
+      <div className="flex items-center justify-center min-h-screen">
+        <Loader2 className="h-8 w-8 animate-spin text-primary" />
+      </div>
+    );
+  }
+
+  if (userRole !== "admin") {
+    return null;
   }
 
   return (
@@ -87,19 +98,27 @@ export default function UsersPage() {
           <div className="rounded-lg border bg-card">
             <div className="p-6">
               <h2 className="text-2xl font-bold mb-4">All Users</h2>
+
               {loading && (
-                <div className="text-center py-8">Loading users...</div>
-              )}
-              {error && (
-                <div className="p-4 text-sm text-red-600 bg-red-50 rounded-md mb-4">
-                  {error}
+                <div className="flex items-center justify-center py-8">
+                  <Loader2 className="h-8 w-8 animate-spin text-primary" />
+                  <span className="ml-2 text-muted-foreground">Loading users...</span>
                 </div>
               )}
+
+              {error && (
+                <div className="flex items-center gap-2 p-4 bg-destructive/10 rounded-lg mb-4">
+                  <AlertCircle className="h-5 w-5 text-destructive" />
+                  <p className="text-destructive">{error}</p>
+                </div>
+              )}
+
               {!loading && !error && users.length === 0 && (
                 <div className="text-center py-8 text-muted-foreground">
                   No users found
                 </div>
               )}
+
               {!loading && !error && users.length > 0 && (
                 <div className="overflow-x-auto">
                   <table className="w-full">
@@ -113,14 +132,20 @@ export default function UsersPage() {
                     </thead>
                     <tbody>
                       {users.map((user) => (
-                        <tr key={user.id} className="border-b hover:bg-muted/50">
-                          <td className="p-3">{user.id}</td>
-                          <td className="p-3">{user.username}</td>
-                          <td className="p-3">{user.email}</td>
+                        <tr
+                          key={user.id}
+                          className="border-b hover:bg-muted/50 transition-colors"
+                        >
+                          <td className="p-3 font-mono text-sm">{user.id}</td>
+                          <td className="p-3 font-medium">{user.username}</td>
+                          <td className="p-3 text-muted-foreground">{user.email}</td>
                           <td className="p-3">
-                            <span className="inline-flex items-center rounded-full px-2.5 py-0.5 text-xs font-medium bg-blue-100 text-blue-800">
-                              {getRoleName(user.role_id)}
-                            </span>
+                            <Badge variant={
+                              user.role_id === 3 ? "default" :
+                              user.role_id === 1 ? "secondary" : "outline"
+                            }>
+                              {getRoleDisplayName(user.role_id)}
+                            </Badge>
                           </td>
                         </tr>
                       ))}
@@ -133,5 +158,5 @@ export default function UsersPage() {
         </div>
       </SidebarInset>
     </SidebarProvider>
-  )
+  );
 }
