@@ -29,6 +29,7 @@ import {
   Wallet,
   ExternalLink,
   Coins,
+  FileText,
 } from "lucide-react";
 import Link from "next/link";
 import { api, Job, JobApplication, JobSubmit } from "@/lib/api";
@@ -596,45 +597,60 @@ export default function JobDetailPage() {
               )}
 
               {/* Employer Actions */}
-              {isAuthenticated && userRole === "employer" && job.status === "assigned" && submissions.length > 0 && (
+              {isAuthenticated && userRole === "employer" && job.status === "assigned" && (
                 <Card className="border-green-500/30">
                   <CardHeader className="pb-2">
-                    <CardTitle className="text-base">Approve Work</CardTitle>
+                    <CardTitle className="text-base">Review & Approve Work</CardTitle>
                     <CardDescription>
                       Review submissions and approve to release payment
                     </CardDescription>
                   </CardHeader>
                   <CardContent className="space-y-3">
-                    {!isConnected && (
-                      <div className="p-2 bg-yellow-500/10 rounded text-xs text-yellow-600 flex items-center gap-2">
-                        <Wallet className="h-3 w-3" />
-                        Connect wallet to approve
-                      </div>
-                    )}
-
-                    {approveError && (
-                      <div className="p-2 bg-destructive/10 rounded text-xs text-destructive">
-                        {approveError instanceof Error ? approveError.message : "Approval failed"}
-                      </div>
-                    )}
-
                     <Button
                       className="w-full"
-                      onClick={handleApproveJob}
-                      disabled={!isConnected || isApprovePending || isApproveConfirming}
+                      variant="outline"
+                      asChild
                     >
-                      {isApprovePending || isApproveConfirming ? (
-                        <>
-                          <Loader2 className="h-4 w-4 mr-2 animate-spin" />
-                          {isApprovePending ? "Confirm in Wallet..." : "Processing..."}
-                        </>
-                      ) : (
-                        <>
-                          <CheckCircle className="h-4 w-4 mr-2" />
-                          Approve & Release Payment
-                        </>
-                      )}
+                      <Link href={`/jobs/${jobId}/submissions`}>
+                        <FileText className="h-4 w-4 mr-2" />
+                        Review All Submissions
+                      </Link>
                     </Button>
+
+                    {submissions.length > 0 && (
+                      <>
+                        {!isConnected && (
+                          <div className="p-2 bg-yellow-500/10 rounded text-xs text-yellow-600 flex items-center gap-2">
+                            <Wallet className="h-3 w-3" />
+                            Connect wallet to approve
+                          </div>
+                        )}
+
+                        {approveError && (
+                          <div className="p-2 bg-destructive/10 rounded text-xs text-destructive">
+                            {approveError instanceof Error ? approveError.message : "Approval failed"}
+                          </div>
+                        )}
+
+                        <Button
+                          className="w-full"
+                          onClick={handleApproveJob}
+                          disabled={!isConnected || isApprovePending || isApproveConfirming}
+                        >
+                          {isApprovePending || isApproveConfirming ? (
+                            <>
+                              <Loader2 className="h-4 w-4 mr-2 animate-spin" />
+                              {isApprovePending ? "Confirm in Wallet..." : "Processing..."}
+                            </>
+                          ) : (
+                            <>
+                              <CheckCircle className="h-4 w-4 mr-2" />
+                              Approve & Release Payment
+                            </>
+                          )}
+                        </Button>
+                      </>
+                    )}
                   </CardContent>
                 </Card>
               )}

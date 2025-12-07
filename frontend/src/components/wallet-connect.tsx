@@ -79,7 +79,7 @@ export function WalletConnect() {
     setIsSwitchingNetwork(true);
     try {
       // Try wagmi switch first
-      switchChain?.({ chainId: targetChainId });
+      switchChain?.({ chainId: targetChainId as 1337 | 31337 });
     } catch {
       // Fallback to manual switch
       try {
@@ -106,7 +106,8 @@ export function WalletConnect() {
 
   const formatBalance = (bal: typeof balance) => {
     if (!bal) return "0.00";
-    const value = parseFloat(bal.formatted);
+    // Convert from wei to ETH (18 decimals)
+    const value = Number(bal.value) / Math.pow(10, bal.decimals);
     return value.toFixed(4);
   };
 

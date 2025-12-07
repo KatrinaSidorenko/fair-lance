@@ -67,7 +67,7 @@ export interface UpdateJobRequest {
   status?: JobStatus;
 }
 
-export type ApplicationStatus = "pending" | "accepted" | "rejected";
+export type ApplicationStatus = "pending" | "accepted" | "submitted" | "approved" | "rejected" | "closed";
 
 export interface JobApplication {
   id: number;
@@ -268,11 +268,11 @@ class ApiClient {
   }
 
   // Accept a job application (employer only)
-  async acceptApplication(applicationId: number): Promise<{ message: string }> {
-    return this.request<{ message: string }>(`/jobapplications/${applicationId}/accept`, {
-      method: "PUT",
-    });
-  }
+//   async acceptApplication(applicationId: number): Promise<{ message: string }> {
+//     return this.request<{ message: string }>(`/jobapplications/${applicationId}/accept`, {
+//       method: "PUT",
+//     });
+//   }
 
   // Reject a job application (employer only)
   async rejectApplication(applicationId: number): Promise<{ message: string }> {

@@ -255,7 +255,12 @@ export default function DashboardPage() {
 
   // Filter applications by status for freelancer view
   const pendingApplications = applications.filter(a => a.status === "pending");
-  const acceptedApplications = applications.filter(a => a.status === "accepted");
+  const inProgressApplications = applications.filter(a =>
+    ["accepted", "submitted"].includes(a.status)
+  );
+  const completedApplications = applications.filter(a =>
+    ["approved", "closed"].includes(a.status)
+  );
 
   return (
     <SidebarProvider>
@@ -496,6 +501,14 @@ export default function DashboardPage() {
                                   </Link>
                                 </Button>
                               )}
+                              {job.status === "assigned" && (
+                                <Button size="sm" asChild>
+                                  <Link href={`/jobs/${job.id}/submissions`}>
+                                    <FileText className="h-4 w-4 mr-1" />
+                                    Review Submissions
+                                  </Link>
+                                </Button>
+                              )}
                             </div>
                           </CardContent>
                         </Card>
@@ -570,13 +583,16 @@ export default function DashboardPage() {
                   </CardContent>
                 </Card>
               ) : (
-                <Tabs defaultValue="pending" className="w-full">
-                  <TabsList className="grid w-full max-w-md grid-cols-2">
+                <Tabs defaultValue="accepted" className="w-full">
+                  <TabsList className="grid w-full max-w-lg grid-cols-3">
                     <TabsTrigger value="pending">
                       Pending ({pendingApplications.length})
                     </TabsTrigger>
                     <TabsTrigger value="accepted">
-                      Accepted ({acceptedApplications.length})
+                      In Progress ({inProgressApplications.length})
+                    </TabsTrigger>
+                    <TabsTrigger value="completed">
+                      Completed ({completedApplications.length})
                     </TabsTrigger>
                   </TabsList>
 
@@ -631,10 +647,10 @@ export default function DashboardPage() {
                   </TabsContent>
 
                   <TabsContent value="accepted" className="space-y-4 mt-4">
-                    {acceptedApplications.length === 0 ? (
-                      <p className="text-center py-8 text-muted-foreground">No accepted applications</p>
+                    {inProgressApplications.length === 0 ? (
+                      <p className="text-center py-8 text-muted-foreground">No jobs in progress</p>
                     ) : (
-                      acceptedApplications.map((app) => {
+                      inProgressApplications.map((app) => {
                         const job = applicationJobs.get(app.job_id);
                         return (
                           <Card key={app.id}>
@@ -643,7 +659,9 @@ export default function DashboardPage() {
                                 <div className="flex-1">
                                   <CardTitle>{job?.title || `Job #${app.job_id}`}</CardTitle>
                                   <CardDescription className="mt-2 space-y-1">
-                                    <Badge className="bg-green-600">Accepted</Badge>
+                                    <Badge className={app.status === "submitted" ? "bg-blue-600" : "bg-green-600"}>
+                                      {app.status === "submitted" ? "Work Submitted" : "Accepted"}
+                                    </Badge>
                                     {job && (
                                       <div className="flex items-center gap-2 mt-2">
                                         <Clock className="h-3 w-3" />
@@ -675,6 +693,67 @@ export default function DashboardPage() {
                                     <Upload className="h-4 w-4" />
                                     Submit Work
                                   </Link>
+                                </Button>
+                                <Button size="sm" variant="outline" asChild>
+                                  <Link href={`/jobs/${app.job_id}`}>View Details</Link>
+                                </Button>
+                              </div>
+                            </CardContent>
+                          </Card>
+                        );
+                      })
+                    )}
+                  </TabsContent>
+
+                  <TabsContent value="completed" className="space-y-4 mt-4">
+                    {completedApplications.length === 0 ? (
+                      <p className="text-center py-8 text-muted-foreground">No completed jobs yet</p>
+                    ) : (
+                      completedApplications.map((app) => {
+                        const job = applicationJobs.get(app.job_id);
+                        const isWithdrawing = withdrawingJobId === app.job_id;
+                        return (
+                          <Card key={app.id}>
+                            <CardHeader>
+                              <div className="flex items-start justify-between">
+                                <div className="flex-1">
+                                  <CardTitle>{job?.title || `Job #${app.job_id}`}</CardTitle>
+                                  <CardDescription className="mt-2 space-y-1">
+                                    <Badge className="bg-green-600">
+                                      <CheckCircle2 className="h-3 w-3 mr-1" />
+                                      Completed
+                                    </Badge>
+                                  </CardDescription>
+                                </div>
+                                {job && (
+                                  <div className="text-right">
+                                    <div className="flex items-center gap-1 font-semibold text-green-600">
+                                      <DollarSign className="h-4 w-4" />
+                                      <span>{job.budget} {job.currency}</span>
+                                    </div>
+                                  </div>
+                                )}
+                              </div>
+                            </CardHeader>
+                            <CardContent>
+                              <div className="flex items-center gap-2">
+                                <Button
+                                  size="sm"
+                                  className="gap-2"
+                                  onClick={() => handleWithdraw(app.job_id)}
+                                  disabled={!isConnected || isWithdrawing || isWithdrawPending || isWithdrawConfirming}
+                                >
+                                  {isWithdrawing ? (
+                                    <>
+                                      <Loader2 className="h-4 w-4 animate-spin" />
+                                      {isWithdrawPending ? "Confirm..." : "Withdrawing..."}
+                                    </>
+                                  ) : (
+                                    <>
+                                      <DollarSign className="h-4 w-4" />
+                                      Withdraw Funds
+                                    </>
+                                  )}
                                 </Button>
                                 <Button size="sm" variant="outline" asChild>
                                   <Link href={`/jobs/${app.job_id}`}>View Details</Link>

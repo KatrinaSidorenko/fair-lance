@@ -19,6 +19,8 @@ import { ArrowLeft, Sparkles, AlertCircle } from "lucide-react";
 import Link from "next/link";
 import { api } from "@/lib/api";
 import { useAuth } from "@/lib/auth-context";
+import { usePublishJob } from "@/lib/web3/hooks";
+import { CreateJobRequest } from "@/lib/api";
 
 export default function CreateJobPage() {
   const router = useRouter();
@@ -31,6 +33,15 @@ export default function CreateJobPage() {
     payment: "",
   });
   const [deadline, setDeadline] = useState<Date | undefined>(undefined);
+
+  const {
+    publishJob: publishJobToChain,
+    isPending: isPublishPending,
+    isConfirming: isPublishConfirming,
+    isConfirmed: isPublishConfirmed,
+    error: publishError,
+    reset: resetPublish,
+  } = usePublishJob();
 
   // Redirect if not authenticated or not an employer
   useEffect(() => {
@@ -54,16 +65,22 @@ export default function CreateJobPage() {
     setError(null);
 
     try {
-      const response = await api.createJob({
+
+      const newJob = {
         title: formData.title,
         description: formData.description,
         due_date: deadline.toISOString(), // ISO8601 format with time
         budget: parseFloat(formData.payment),
         currency: "ETH",
         status: publishImmediately ? "published" : "draft",
-      });
+      }
+      const response = await api.createJob(newJob as CreateJobRequest);
 
       console.log("Job created with ID:", response.job_id);
+
+      if (publishImmediately) {
+        await publishJobToChain(response.job_id, formData.payment);
+      }
       router.push("/dashboard");
     } catch (err) {
       setError(err instanceof Error ? err.message : "Failed to create job");

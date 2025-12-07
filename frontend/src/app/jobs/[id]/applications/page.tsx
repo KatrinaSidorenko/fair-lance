@@ -102,7 +102,7 @@ export default function JobApplicationsPage() {
       // Update backend after blockchain confirmation
       const completeAcceptance = async () => {
         try {
-          await api.acceptApplication(pendingBlockchainApp.id);
+          //await api.acceptApplication(pendingBlockchainApp.id);
           setApplications(apps =>
             apps.map(a =>
               a.id === pendingBlockchainApp.id ? { ...a, status: "accepted" } : a
@@ -407,10 +407,18 @@ export default function JobApplicationsPage() {
                       </Badge>
                     </div>
                   </CardHeader>
-                  <CardContent>
+                  <CardContent className="space-y-3">
                     <p className="text-sm text-muted-foreground line-clamp-2">
                       {app.cover_letter}
                     </p>
+                    {app.status === "accepted" && (
+                      <Button size="sm" asChild>
+                        <Link href={`/jobs/${jobId}/submissions`}>
+                          <FileText className="h-4 w-4 mr-1" />
+                          Review Submissions
+                        </Link>
+                      </Button>
+                    )}
                   </CardContent>
                 </Card>
               ))}
